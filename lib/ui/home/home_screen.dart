@@ -351,7 +351,7 @@ class SearchIcon extends StatefulWidget {
 }
 
 class _SearchIconState extends State<SearchIcon> {
-  bool isshowSearch(BuildContext context) {
+  bool showSearch(BuildContext context) {
     final scrollPosition = controller.offset;
     if (scrollPosition > (MediaQuery.of(context).size.height * 0.2)) {
       return true;
@@ -380,14 +380,11 @@ class _SearchIconState extends State<SearchIcon> {
   Widget build(BuildContext context) {
     return AnimatedScale(
       duration: Duration(milliseconds: 80),
-      scale: isshowSearch(context) ? 2 : 0,
+      scale: showSearch(context) ? 2 : 0,
       child: Visibility(
-        visible: isshowSearch(context),
+        visible: showSearch(context),
         child: GestureDetector(
-          onTap: () {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(';d;d')));
-          },
+          onTap: () {},
           child: const Icon(
             CupertinoIcons.search,
             color: Colors.white,
