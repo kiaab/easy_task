@@ -34,6 +34,7 @@ class _SearchIconState extends State<SearchIcon> {
   @override
   void dispose() {
     homeScreenController.removeListener(() {});
+
     super.dispose();
   }
 
