@@ -1,11 +1,15 @@
 import 'dart:async';
 
 import 'package:easy_task/main.dart';
-import 'package:easy_task/widgets.dart';
+import 'package:easy_task/widgets/search_bar.dart';
+import 'package:easy_task/widgets/search_icon.dart';
+import 'package:easy_task/widgets/task_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+
+final ScrollController homeScreenController = ScrollController();
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -13,8 +17,6 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
-
-final ScrollController controller = ScrollController();
 
 class _HomeScreenState extends State<HomeScreen> {
   bool? checked = false;
@@ -54,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         body: SingleChildScrollView(
-          controller: controller,
+          controller: homeScreenController,
           child: Column(
             children: [
               Container(
@@ -157,90 +159,6 @@ class Body extends StatelessWidget {
   }
 }
 
-class TaskList extends StatefulWidget {
-  const TaskList({
-    Key? key,
-    required this.theme,
-  }) : super(key: key);
-
-  final ThemeData theme;
-
-  @override
-  State<TaskList> createState() => _TaskListState();
-}
-
-class _TaskListState extends State<TaskList> {
-  bool? checked = false;
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-        padding: const EdgeInsets.only(bottom: 55),
-        physics: const BouncingScrollPhysics(),
-        shrinkWrap: true,
-        itemExtent: 85,
-        itemCount: 8,
-        itemBuilder: (context, index) {
-          return Stack(
-            children: [
-              Container(
-                height: 64,
-                margin: EdgeInsets.fromLTRB(32, 8, 32, 8),
-                decoration: BoxDecoration(
-                    color: checked! ? null : Colors.red,
-                    borderRadius: BorderRadius.circular(12)),
-              ),
-              Container(
-                height: 64,
-                padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-                margin: EdgeInsets.fromLTRB(32, 8, !checked! ? 36 : 32, 8),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: checked!
-                        ? widget.theme.colorScheme.secondary.withOpacity(0.2)
-                        : Colors.white,
-                    boxShadow: !checked!
-                        ? [
-                            BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 5)
-                          ]
-                        : null,
-                    border: checked!
-                        ? Border.all(
-                            color: widget.theme.colorScheme.secondary
-                                .withOpacity(0.2))
-                        : null),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'انجام تکالیف',
-                      style: TextStyle(
-                          decoration:
-                              checked! ? TextDecoration.lineThrough : null),
-                    ),
-                    Checkbox(
-                        activeColor: widget.theme.colorScheme.secondary,
-                        shape: RoundedRectangleBorder(
-                          side: BorderSide(
-                              color: widget.theme.colorScheme.secondary),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        value: checked,
-                        onChanged: (value) {
-                          setState(() {
-                            checked = value;
-                          });
-                        })
-                  ],
-                ),
-              ),
-            ],
-          );
-        });
-  }
-}
-
 class ProjecList extends StatelessWidget {
   const ProjecList({
     Key? key,
@@ -337,61 +255,6 @@ class ProjecList extends StatelessWidget {
               ],
             );
           }),
-    );
-  }
-}
-
-class SearchIcon extends StatefulWidget {
-  const SearchIcon({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  State<SearchIcon> createState() => _SearchIconState();
-}
-
-class _SearchIconState extends State<SearchIcon> {
-  bool showSearch(BuildContext context) {
-    final scrollPosition = controller.offset;
-    if (scrollPosition > (MediaQuery.of(context).size.height * 0.2)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  @override
-  void initState() {
-    controller.addListener(
-      () {
-        setState(() {});
-      },
-    );
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    controller.removeListener(() {});
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedScale(
-      duration: Duration(milliseconds: 80),
-      scale: showSearch(context) ? 2 : 0,
-      child: Visibility(
-        visible: showSearch(context),
-        child: GestureDetector(
-          onTap: () {},
-          child: const Icon(
-            CupertinoIcons.search,
-            color: Colors.white,
-            size: 12,
-          ),
-        ),
-      ),
     );
   }
 }
