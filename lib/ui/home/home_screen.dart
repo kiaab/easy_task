@@ -26,7 +26,6 @@ class _HomeScreenState extends State<HomeScreen> {
   bool? checked = false;
   @override
   void dispose() {
-    homeScreenController.dispose();
     super.dispose();
   }
 
@@ -70,6 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: BlocBuilder<HomeBloc, HomeState>(
             builder: (context, state) {
               if (state is HomeSuccess) {
+                final tasks = state.tasks;
                 return SingleChildScrollView(
                   controller: homeScreenController,
                   child: Column(
@@ -131,7 +131,41 @@ class _HomeScreenState extends State<HomeScreen> {
                           )),
                       Container(
                         child: Stack(
-                          children: [Body(theme: theme, checked: checked)],
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(
+                                  height: 28,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 32),
+                                  child: RichText(
+                                      text: TextSpan(
+                                          style: theme.textTheme.headline4,
+                                          text: 'پروژه ها',
+                                          children: [
+                                        TextSpan(
+                                            text: '(2)',
+                                            style: theme.textTheme.headline4!
+                                                .copyWith(
+                                                    color:
+                                                        MyApp.primaryTextColor))
+                                      ])),
+                                ),
+                                ProjecList(theme: theme),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(right: 32, top: 8),
+                                  child: Text(
+                                    'تسک ها',
+                                    style: theme.textTheme.headline4,
+                                  ),
+                                ),
+                                TaskList(theme: theme, tasks: tasks)
+                              ],
+                            )
+                          ],
                         ),
                       )
                     ],
@@ -142,53 +176,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: CircularProgressIndicator(),
                 );
               } else if (state is HomeError) {
-                return ErrorState();
+                return const ErrorState();
+              } else if (state is EmptyState) {
+                return Center(
+                  child: Text('هنوز تسکی نساختی'),
+                );
               } else {
                 throw Exception('invalid state');
               }
             },
           ),
         ));
-  }
-}
-
-class Body extends StatelessWidget {
-  const Body({Key? key, required this.theme, required this.checked})
-      : super(key: key);
-  final ThemeData theme;
-  final bool? checked;
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(
-          height: 28,
-        ),
-        Padding(
-          padding: const EdgeInsets.only(right: 32),
-          child: RichText(
-              text: TextSpan(
-                  style: theme.textTheme.headline4,
-                  text: 'پروژه ها',
-                  children: [
-                TextSpan(
-                    text: '(2)',
-                    style: theme.textTheme.headline4!
-                        .copyWith(color: MyApp.primaryTextColor))
-              ])),
-        ),
-        ProjecList(theme: theme),
-        Padding(
-          padding: const EdgeInsets.only(right: 32, top: 8),
-          child: Text(
-            'تسک ها',
-            style: theme.textTheme.headline4,
-          ),
-        ),
-        TaskList(theme: theme)
-      ],
-    );
   }
 }
 
