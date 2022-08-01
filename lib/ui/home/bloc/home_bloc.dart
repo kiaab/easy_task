@@ -14,7 +14,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         emit(HomeLoading());
         try {
           final tasks = await taskRepository.getTasks();
-          emit(HomeSuccess(tasks));
+          if (tasks.isEmpty) {
+            emit(EmptyState());
+          } else {
+            emit(HomeSuccess(tasks));
+          }
         } catch (e) {
           emit(HomeError());
         }

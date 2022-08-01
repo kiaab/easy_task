@@ -13,9 +13,13 @@ class SearchIcon extends StatefulWidget {
 
 class _SearchIconState extends State<SearchIcon> {
   bool showSearch(BuildContext context) {
-    final scrollPosition = homeScreenController.offset;
-    if (scrollPosition > (MediaQuery.of(context).size.height * 0.2)) {
-      return true;
+    if (homeScreenController.hasClients) {
+      final scrollPosition = homeScreenController.offset;
+      if (scrollPosition > (MediaQuery.of(context).size.height * 0.2)) {
+        return true;
+      } else {
+        return false;
+      }
     } else {
       return false;
     }

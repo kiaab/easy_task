@@ -18,3 +18,5 @@ class HomeSuccess extends HomeState {
 }
 
 class HomeError extends HomeState {}
+
+class EmptyState extends HomeState {}

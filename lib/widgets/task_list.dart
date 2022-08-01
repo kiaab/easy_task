@@ -1,54 +1,62 @@
+import 'package:easy_task/data/task.dart';
 import 'package:flutter/material.dart';
 
 class TaskList extends StatefulWidget {
   const TaskList({
     Key? key,
     required this.theme,
+    required this.tasks,
   }) : super(key: key);
 
   final ThemeData theme;
+  final List<TaskEntity> tasks;
 
   @override
   State<TaskList> createState() => _TaskListState();
 }
 
 class _TaskListState extends State<TaskList> {
-  bool? checked = false;
   @override
   Widget build(BuildContext context) {
+    final tasks = widget.tasks;
     return ListView.builder(
         padding: const EdgeInsets.only(bottom: 55),
         physics: const BouncingScrollPhysics(),
         shrinkWrap: true,
         itemExtent: 85,
-        itemCount: 8,
+        itemCount: tasks.length,
         itemBuilder: (context, index) {
+          final task = tasks[index];
+          bool? checked = task.checked;
           return Stack(
             children: [
-              Container(
-                height: 64,
-                margin: EdgeInsets.fromLTRB(32, 8, 32, 8),
-                decoration: BoxDecoration(
-                    color: checked! ? null : Colors.red,
-                    borderRadius: BorderRadius.circular(12)),
+              Visibility(
+                visible: task.important,
+                child: Container(
+                  height: 64,
+                  margin: EdgeInsets.fromLTRB(32, 8, 32, 8),
+                  decoration: BoxDecoration(
+                      color: checked ? null : Colors.red,
+                      borderRadius: BorderRadius.circular(12)),
+                ),
               ),
               Container(
                 height: 64,
                 padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-                margin: EdgeInsets.fromLTRB(32, 8, !checked! ? 36 : 32, 8),
+                margin: EdgeInsets.fromLTRB(32, 8, task.important ? 36 : 32, 8),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    color: checked!
+                    color: checked
                         ? widget.theme.colorScheme.secondary.withOpacity(0.2)
                         : Colors.white,
-                    boxShadow: !checked!
+                    boxShadow: !checked
                         ? [
                             BoxShadow(
                                 color: Colors.black.withOpacity(0.1),
                                 blurRadius: 5)
                           ]
                         : null,
-                    border: checked!
+                    border: checked
                         ? Border.all(
                             color: widget.theme.colorScheme.secondary
                                 .withOpacity(0.2))
@@ -57,10 +65,10 @@ class _TaskListState extends State<TaskList> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'انجام تکالیف',
+                      task.content,
                       style: TextStyle(
                           decoration:
-                              checked! ? TextDecoration.lineThrough : null),
+                              checked ? TextDecoration.lineThrough : null),
                     ),
                     Checkbox(
                         activeColor: widget.theme.colorScheme.secondary,
