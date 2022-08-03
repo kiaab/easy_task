@@ -15,10 +15,10 @@ class SearchFieldClicked extends HomeEvent {
   const SearchFieldClicked([this.searchKey = '']);
 }
 
-class CheckedClicked extends HomeEvent {
+class UpdateTask extends HomeEvent {
   final TaskEntity task;
 
-  const CheckedClicked(this.task);
+  const UpdateTask(this.task);
   @override
   List<Object> get props => [task];
 }

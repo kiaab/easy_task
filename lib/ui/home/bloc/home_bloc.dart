@@ -22,7 +22,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             searchKey = '';
           }
           final tasks = await taskRepository.getTasks(searchKey);
-          if (tasks.isEmpty) {
+          if (tasks.isEmpty && event is HomeStarted) {
             emit(EmptyState());
           } else {
             emit(HomeSuccess(tasks));
@@ -30,7 +30,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         } catch (e) {
           emit(HomeError());
         }
-      } else if (event is CheckedClicked) {
+      } else if (event is UpdateTask) {
         taskRepository.addOrUpdate(event.task);
       }
     });

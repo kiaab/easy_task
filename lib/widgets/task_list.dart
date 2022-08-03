@@ -60,9 +60,8 @@ class TaskList extends StatelessWidget {
                       context: context,
                       builder: (context) {
                         return TaskBottomSheet(
-                          checked: checked,
+                          task: task,
                           theme: theme,
-                          taskId: task.key,
                         );
                       });
                 },
@@ -89,14 +88,20 @@ class TaskList extends StatelessWidget {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Icon(
-                            task.important
-                                ? CupertinoIcons.flag_fill
-                                : CupertinoIcons.flag,
-                            size: 18,
-                            color: task.important
-                                ? Colors.red
-                                : MyApp.primaryTextColor,
+                          GestureDetector(
+                            onTap: () {
+                              task.important = !task.important;
+                              bloc?.add(UpdateTask(task));
+                            },
+                            child: Icon(
+                              task.important
+                                  ? CupertinoIcons.flag_fill
+                                  : CupertinoIcons.flag,
+                              size: 18,
+                              color: task.important
+                                  ? Colors.red
+                                  : MyApp.primaryTextColor,
+                            ),
                           ),
                           SizedBox(
                             width: 8,
@@ -117,7 +122,7 @@ class TaskList extends StatelessWidget {
                               value: checked,
                               onChanged: (value) {
                                 task.checked = value!;
-                                bloc!.add(CheckedClicked(task));
+                                bloc!.add(UpdateTask(task));
                               })
                         ],
                       ),
