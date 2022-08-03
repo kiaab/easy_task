@@ -8,3 +8,17 @@ abstract class HomeEvent extends Equatable {
 }
 
 class HomeStarted extends HomeEvent {}
+
+class SearchFieldClicked extends HomeEvent {
+  final String searchKey;
+
+  const SearchFieldClicked([this.searchKey = '']);
+}
+
+class CheckedClicked extends HomeEvent {
+  final TaskEntity task;
+
+  const CheckedClicked(this.task);
+  @override
+  List<Object> get props => [task];
+}

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bloc/bloc.dart';
 import 'package:easy_task/data/repo/task_repo.dart';
 import 'package:easy_task/data/task.dart';
@@ -10,10 +12,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final ITaskRepository taskRepository;
   HomeBloc({required this.taskRepository}) : super(HomeLoading()) {
     on<HomeEvent>((event, emit) async {
-      if (event is HomeStarted) {
+      if (event is HomeStarted || event is SearchFieldClicked) {
         emit(HomeLoading());
+        final String searchKey;
         try {
-          final tasks = await taskRepository.getTasks();
+          if (event is SearchFieldClicked) {
+            searchKey = event.searchKey;
+          } else {
+            searchKey = '';
+          }
+          final tasks = await taskRepository.getTasks(searchKey);
           if (tasks.isEmpty) {
             emit(EmptyState());
           } else {
@@ -22,6 +30,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         } catch (e) {
           emit(HomeError());
         }
+      } else if (event is CheckedClicked) {
+        taskRepository.addOrUpdate(event.task);
       }
     });
   }

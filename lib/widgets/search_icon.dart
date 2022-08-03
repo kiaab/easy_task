@@ -45,7 +45,7 @@ class _SearchIconState extends State<SearchIcon> {
   @override
   Widget build(BuildContext context) {
     return AnimatedScale(
-      duration: Duration(milliseconds: 80),
+      duration: const Duration(milliseconds: 80),
       scale: showSearch(context) ? 2 : 0,
       child: Visibility(
         visible: showSearch(context),

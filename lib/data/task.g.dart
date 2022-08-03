@@ -7,7 +7,12 @@ class TaskAdapter extends TypeAdapter<TaskEntity> {
     final fields = <int, dynamic>{
       for (var i = 0; i < numOfFeilds; i++) reader.readByte(): reader.read()
     };
-    return TaskEntity(fields[0], fields[1], fields[2]);
+    return TaskEntity(
+        title: fields[0],
+        content: fields[1],
+        tag: fields[2],
+        checked: fields[3],
+        important: fields[4]);
   }
 
   @override
@@ -16,12 +21,16 @@ class TaskAdapter extends TypeAdapter<TaskEntity> {
   @override
   void write(BinaryWriter writer, TaskEntity obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(5)
       ..writeByte(0)
-      ..write(obj.content)
+      ..write(obj.title)
       ..writeByte(1)
-      ..write(obj.checked)
+      ..write(obj.content)
       ..writeByte(2)
+      ..write(obj.tag)
+      ..writeByte(3)
+      ..write(obj.checked)
+      ..writeByte(4)
       ..write(obj.important);
   }
 

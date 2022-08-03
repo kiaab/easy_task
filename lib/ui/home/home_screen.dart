@@ -1,16 +1,18 @@
-import 'dart:async';
-
 import 'package:easy_task/data/repo/task_repo.dart';
+import 'package:easy_task/data/task.dart';
 import 'package:easy_task/main.dart';
+import 'package:easy_task/ui/add_or_edit/add_edit_screen.dart';
 import 'package:easy_task/ui/home/bloc/home_bloc.dart';
 import 'package:easy_task/widgets/error_state.dart';
 import 'package:easy_task/widgets/search_bar.dart';
 import 'package:easy_task/widgets/search_icon.dart';
 import 'package:easy_task/widgets/task_list.dart';
+
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 final ScrollController homeScreenController = ScrollController();
@@ -26,7 +28,19 @@ class _HomeScreenState extends State<HomeScreen> {
   bool? checked = false;
   @override
   void dispose() {
+    boxListener.removeListener(() {});
     super.dispose();
+  }
+
+  final boxListener = Hive.box<TaskEntity>(taskBoxName).listenable();
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
+  HomeBloc? bloc;
+  @override
+  void initState() {
+    boxListener.addListener(() {
+      bloc!.add(HomeStarted());
+    });
+    super.initState();
   }
 
   @override
@@ -35,18 +49,12 @@ class _HomeScreenState extends State<HomeScreen> {
     final Size size = MediaQuery.of(context).size;
 
     return Scaffold(
+        key: scaffoldKey,
         appBar: AppBar(
           centerTitle: true,
           elevation: 0,
-          title: Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: Text(
-              'تسک ها',
-              style: theme.textTheme.headline6!.copyWith(
-                  fontSize: 22,
-                  color: Colors.white,
-                  fontWeight: FontWeight.normal),
-            ),
+          title: Text(
+            ' صفحه اصلی',
           ),
           actions: const [
             Padding(
@@ -57,15 +65,27 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         floatingActionButton: FloatingActionButton(
           backgroundColor: theme.colorScheme.primary,
-          onPressed: () {},
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => AddOrEditScreen(
+                  task: TaskEntity(),
+                ),
+              ),
+            );
+          },
           child: const Icon(
             CupertinoIcons.plus,
             color: Colors.white,
           ),
         ),
         body: BlocProvider<HomeBloc>(
-          create: (context) => HomeBloc(taskRepository: getIt<TaskRepository>())
-            ..add(HomeStarted()),
+          create: (context) {
+            final bloc = HomeBloc(taskRepository: getIt<TaskRepository>());
+            bloc.add(HomeStarted());
+            this.bloc = bloc;
+            return bloc;
+          },
           child: BlocBuilder<HomeBloc, HomeState>(
             builder: (context, state) {
               if (state is HomeSuccess) {
@@ -74,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   controller: homeScreenController,
                   child: Column(
                     children: [
-                      Container(
+                      SizedBox(
                           height: size.height * 0.22,
                           child: Stack(
                             children: [
@@ -87,34 +107,30 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               Positioned(
                                 child: Padding(
-                                  padding: const EdgeInsets.only(right: 32),
+                                  padding: const EdgeInsets.only(
+                                      right: 32, left: 32),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'سلام کیا',
-                                        style: theme.textTheme.bodyText2!
+                                        style: theme.textTheme.headline6!
                                             .copyWith(
-                                                color: Colors.white
-                                                    .withOpacity(0.5)),
-                                      ),
-                                      const SizedBox(
-                                        height: 8,
+                                                fontSize: 22,
+                                                color: Colors.white),
                                       ),
                                       SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width /
-                                                2,
-                                        child: Text(
-                                          'امروز 5 تسک برای انجام دادن داری',
-                                          maxLines: 2,
-                                          style: theme.textTheme.headline6!
-                                              .copyWith(
-                                                  color: Colors.white,
-                                                  fontSize: 20,
-                                                  height: 1.2),
-                                        ),
+                                        height: 2,
+                                      ),
+                                      Text(
+                                        '12/5/1401 ',
+                                        style: theme.textTheme.headline6!
+                                            .copyWith(
+                                                color: Colors.white
+                                                    .withOpacity(0.7),
+                                                fontSize: 12,
+                                                height: 1.2),
                                       ),
                                     ],
                                   ),
@@ -125,48 +141,60 @@ class _HomeScreenState extends State<HomeScreen> {
                                   left: 0,
                                   bottom: 0,
                                   child: SearchBar(
+                                    bloc: bloc!,
                                     theme: theme,
                                   ))
                             ],
                           )),
-                      Container(
-                        child: Stack(
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(
-                                  height: 28,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 32),
-                                  child: RichText(
-                                      text: TextSpan(
-                                          style: theme.textTheme.headline4,
-                                          text: 'پروژه ها',
-                                          children: [
-                                        TextSpan(
-                                            text: '(2)',
-                                            style: theme.textTheme.headline4!
-                                                .copyWith(
-                                                    color:
-                                                        MyApp.primaryTextColor))
-                                      ])),
-                                ),
-                                ProjecList(theme: theme),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.only(right: 32, top: 8),
-                                  child: Text(
-                                    'تسک ها',
-                                    style: theme.textTheme.headline4,
-                                  ),
-                                ),
-                                TaskList(theme: theme, tasks: tasks)
-                              ],
-                            )
-                          ],
-                        ),
+                      Stack(
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(
+                                height: 28,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(right: 32),
+                                child: RichText(
+                                    text: TextSpan(
+                                        style: theme.textTheme.headline4,
+                                        text: 'پروژه ها',
+                                        children: [
+                                      TextSpan(
+                                          text: '(2)',
+                                          style: theme.textTheme.headline4!
+                                              .copyWith(
+                                                  color:
+                                                      MyApp.primaryTextColor))
+                                    ])),
+                              ),
+                              ProjecList(theme: theme),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(right: 32, top: 8),
+                                child: RichText(
+                                    text: TextSpan(
+                                        style: theme.textTheme.headline4,
+                                        text: 'تسک ها',
+                                        children: [
+                                      TextSpan(
+                                          text: '(5)',
+                                          style: theme.textTheme.headline4!
+                                              .copyWith(
+                                                  color:
+                                                      MyApp.primaryTextColor))
+                                    ])),
+                              ),
+                              TaskList(
+                                tasks: tasks,
+                                theme: theme,
+                                bloc: bloc,
+                                scaffoldKey: scaffoldKey,
+                              ),
+                            ],
+                          )
+                        ],
                       )
                     ],
                   ),
@@ -178,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
               } else if (state is HomeError) {
                 return const ErrorState();
               } else if (state is EmptyState) {
-                return Center(
+                return const Center(
                   child: Text('هنوز تسکی نساختی'),
                 );
               } else {

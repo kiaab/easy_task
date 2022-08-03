@@ -4,11 +4,20 @@ part 'task.g.dart';
 @HiveType(typeId: 0)
 class TaskEntity extends HiveObject {
   @HiveField(0)
+  String title;
+  @HiveField(1)
   String content;
-  @HiveField(1, defaultValue: false)
+  @HiveField(2)
+  String tag;
+  @HiveField(3)
   bool checked;
-  @HiveField(2, defaultValue: false)
+  @HiveField(4)
   bool important;
 
-  TaskEntity(this.content, this.checked, this.important);
+  TaskEntity(
+      {this.title = '',
+      this.content = '',
+      this.tag = '',
+      this.checked = false,
+      this.important = false});
 }

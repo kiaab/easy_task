@@ -21,8 +21,8 @@ class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
   static const fontFamily = 'Yekan';
-  static final primaryTextColor = Color(0xff273067).withOpacity(0.3);
-  static const secondaryTextColor = Color(0xff273067);
+  static const primaryTextColor = Color(0xff273067);
+  static final secondaryTextColor = Color(0xff273067).withOpacity(0.3);
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -35,6 +35,11 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
+          checkboxTheme: CheckboxThemeData(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
           scaffoldBackgroundColor: Colors.white,
           textTheme: TextTheme(
             bodyText2: TextStyle(
@@ -52,7 +57,7 @@ class _MyAppState extends State<MyApp> {
                 fontFamily: MyApp.fontFamily,
                 color: MyApp.secondaryTextColor,
                 fontSize: 12),
-            caption: TextStyle(
+            caption: const TextStyle(
                 fontFamily: MyApp.fontFamily,
                 color: Colors.white,
                 fontSize: 10),

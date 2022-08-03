@@ -1,17 +1,22 @@
 import 'package:easy_task/main.dart';
+import 'package:easy_task/ui/home/bloc/home_bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class SearchBar extends StatelessWidget {
   const SearchBar({
     Key? key,
     required this.theme,
+    required this.bloc,
   }) : super(key: key);
 
   final ThemeData theme;
-
+  final HomeBloc bloc;
   @override
   Widget build(BuildContext context) {
+    final TextEditingController searchController =
+        TextEditingController(text: '');
     return Padding(
       padding: const EdgeInsets.only(left: 32, right: 32),
       child: Container(
@@ -21,6 +26,9 @@ class SearchBar extends StatelessWidget {
               blurRadius: 20, color: theme.colorScheme.primary.withOpacity(0.2))
         ]),
         child: TextField(
+          onChanged: (value) {
+            bloc.add(SearchFieldClicked(value));
+          },
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,
