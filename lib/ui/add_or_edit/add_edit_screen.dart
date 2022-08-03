@@ -122,6 +122,7 @@ class AddOrEditScreen extends StatelessWidget {
                             ],
                           ),
                           TextField(
+                            keyboardType: TextInputType.multiline,
                             controller: contentTextController,
                             decoration: InputDecoration(
                               hintText:

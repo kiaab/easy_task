@@ -15,17 +15,16 @@ class TaskList extends StatelessWidget {
     required this.tasks,
     required this.theme,
     required this.bloc,
-    required this.scaffoldKey,
   }) : super(key: key);
 
   final List<TaskEntity> tasks;
   final ThemeData theme;
   final HomeBloc? bloc;
-  final GlobalKey<ScaffoldState> scaffoldKey;
+
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-        padding: const EdgeInsets.only(bottom: 55),
+        padding: const EdgeInsets.only(bottom: 60),
         physics: const BouncingScrollPhysics(),
         shrinkWrap: true,
         itemExtent: 85,
@@ -38,7 +37,7 @@ class TaskList extends StatelessWidget {
               Visibility(
                 visible: task.important,
                 child: Container(
-                  height: 64,
+                  height: 60,
                   margin: const EdgeInsets.fromLTRB(32, 8, 32, 8),
                   decoration: BoxDecoration(
                       color: checked ? null : Colors.red,
@@ -66,10 +65,10 @@ class TaskList extends StatelessWidget {
                       });
                 },
                 child: Container(
-                  height: 65,
+                  height: 60,
                   padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
-                  margin:
-                      EdgeInsets.fromLTRB(32, 8, task.important ? 36 : 32, 8),
+                  margin: EdgeInsets.fromLTRB(
+                      32, 8, task.important && !checked ? 36 : 32, 8),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                       color: checked
@@ -86,6 +85,7 @@ class TaskList extends StatelessWidget {
                   child: Column(
                     children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           GestureDetector(

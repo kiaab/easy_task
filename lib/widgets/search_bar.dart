@@ -9,10 +9,12 @@ class SearchBar extends StatelessWidget {
     Key? key,
     required this.theme,
     required this.bloc,
+    required this.focusNode,
   }) : super(key: key);
 
   final ThemeData theme;
-  final HomeBloc bloc;
+  final HomeBloc? bloc;
+  final FocusNode focusNode;
   @override
   Widget build(BuildContext context) {
     final TextEditingController searchController =
@@ -26,8 +28,10 @@ class SearchBar extends StatelessWidget {
               blurRadius: 20, color: theme.colorScheme.primary.withOpacity(0.2))
         ]),
         child: TextField(
+          keyboardType: TextInputType.text,
+          focusNode: focusNode,
           onChanged: (value) {
-            bloc.add(SearchFieldClicked(value));
+            bloc?.add(SearchFieldClicked(value));
           },
           decoration: InputDecoration(
             fillColor: Colors.white,

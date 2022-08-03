@@ -2,7 +2,7 @@ import 'package:easy_task/data/task.dart';
 import 'package:hive_flutter/adapters.dart';
 
 abstract class ITaskDataSource {
-  Future<List<TaskEntity>> getTasks(String searchKey);
+  List<TaskEntity> getTasks(String searchKey);
 
   TaskEntity getTask(int id);
 
@@ -38,7 +38,7 @@ class TaskDataSource implements ITaskDataSource {
   }
 
   @override
-  Future<List<TaskEntity>> getTasks(String searchKey) async {
+  List<TaskEntity> getTasks(String searchKey) {
     if (searchKey.isNotEmpty) {
       return taskBox.values.where((element) {
         return element.title.contains(searchKey) ||

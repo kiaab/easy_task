@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_task/data/repo/task_repo.dart';
 import 'package:easy_task/data/task.dart';
 import 'package:easy_task/main.dart';
@@ -15,7 +17,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
-final ScrollController homeScreenController = ScrollController();
+final ScrollController homeScrollController = ScrollController();
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -25,197 +27,218 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool? checked = false;
+  HomeBloc? _homeBloc;
   @override
   void dispose() {
     boxListener.removeListener(() {});
-    bloc?.close();
+    _homeBloc?.close();
     super.dispose();
   }
 
   final boxListener = Hive.box<TaskEntity>(taskBoxName).listenable();
-  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
-  HomeBloc? bloc;
+
   @override
   void initState() {
     boxListener.addListener(() {
-      bloc!.add(HomeStarted());
+      _homeBloc!.add(HomeStarted());
     });
     super.initState();
   }
 
+  final FocusNode focusNode = FocusNode();
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final Size size = MediaQuery.of(context).size;
 
-    return Scaffold(
-        key: scaffoldKey,
-        appBar: AppBar(
-          centerTitle: true,
-          elevation: 0,
-          title: Text(
-            ' صفحه اصلی',
-          ),
-          actions: const [
-            Padding(
-              padding: EdgeInsets.only(left: 32),
-              child: SearchIcon(),
+    return GestureDetector(
+      onTap: () {
+        if (focusNode.hasFocus) {
+          focusNode.unfocus();
+        }
+      },
+      child: Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            centerTitle: true,
+            elevation: 0,
+            title: const Text(
+              ' صفحه اصلی',
             ),
-          ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: theme.colorScheme.primary,
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => AddOrEditScreen(
-                  task: TaskEntity(),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(left: 32),
+                child: SizedBox(
+                  width: 20,
+                  child: GestureDetector(
+                      onTap: () {
+                        if (homeScrollController.hasClients) {
+                          homeScrollController.animateTo(0,
+                              duration: const Duration(seconds: 1),
+                              curve: Curves.decelerate);
+                          Timer(Duration(seconds: 1), () {
+                            focusNode.requestFocus();
+                          });
+                        }
+                      },
+                      child: const SearchIcon()),
                 ),
               ),
-            );
-          },
-          child: const Icon(
-            CupertinoIcons.plus,
-            color: Colors.white,
+            ],
           ),
-        ),
-        body: BlocProvider<HomeBloc>(
-          create: (context) {
-            final bloc = HomeBloc(taskRepository: getIt<TaskRepository>());
-            bloc.add(HomeStarted());
-            this.bloc = bloc;
-            return bloc;
-          },
-          child: BlocBuilder<HomeBloc, HomeState>(
-            builder: (context, state) {
-              if (state is HomeSuccess) {
-                final tasks = state.tasks;
-                return SingleChildScrollView(
-                  controller: homeScreenController,
-                  child: Column(
-                    children: [
-                      SizedBox(
-                          height: size.height * 0.22,
-                          child: Stack(
-                            children: [
-                              Container(
-                                height: size.height * 0.22 - 26,
-                                decoration: BoxDecoration(
-                                    color: theme.colorScheme.primary,
-                                    borderRadius: const BorderRadius.vertical(
-                                        bottom: Radius.circular(48))),
-                              ),
-                              Positioned(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      right: 32, left: 32),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'سلام کیا',
-                                        style: theme.textTheme.headline6!
-                                            .copyWith(
-                                                fontSize: 22,
-                                                color: Colors.white),
-                                      ),
-                                      SizedBox(
-                                        height: 2,
-                                      ),
-                                      Text(
-                                        '12/5/1401 ',
-                                        style: theme.textTheme.headline6!
-                                            .copyWith(
-                                                color: Colors.white
-                                                    .withOpacity(0.7),
-                                                fontSize: 12,
-                                                height: 1.2),
-                                      ),
-                                    ],
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: theme.colorScheme.primary,
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => AddOrEditScreen(
+                    task: TaskEntity(),
+                  ),
+                ),
+              );
+            },
+            child: const Icon(
+              CupertinoIcons.plus,
+              color: Colors.white,
+            ),
+          ),
+          body: BlocProvider<HomeBloc>(
+            create: (context) {
+              final bloc = HomeBloc(taskRepository: getIt<TaskRepository>());
+              bloc.add(HomeStarted());
+              _homeBloc = bloc;
+              return bloc;
+            },
+            child: BlocBuilder<HomeBloc, HomeState>(
+              builder: (context, state) {
+                if (state is HomeSuccess) {
+                  final tasks = state.tasks;
+                  return SingleChildScrollView(
+                    controller: homeScrollController,
+                    child: Column(
+                      children: [
+                        SizedBox(
+                            height: size.height * 0.22,
+                            child: Stack(
+                              children: [
+                                Container(
+                                  height: size.height * 0.22 - 26,
+                                  decoration: BoxDecoration(
+                                      color: theme.colorScheme.primary,
+                                      borderRadius: const BorderRadius.vertical(
+                                          bottom: Radius.circular(48))),
+                                ),
+                                Positioned(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        right: 32, left: 32),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'سلام کیا',
+                                          style: theme.textTheme.headline6!
+                                              .copyWith(
+                                                  fontSize: 22,
+                                                  color: Colors.white),
+                                        ),
+                                        const SizedBox(
+                                          height: 2,
+                                        ),
+                                        Text(
+                                          '12/5/1401 ',
+                                          style: theme.textTheme.headline6!
+                                              .copyWith(
+                                                  color: Colors.white
+                                                      .withOpacity(0.7),
+                                                  fontSize: 12,
+                                                  height: 1.2),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Positioned(
-                                  right: 0,
-                                  left: 0,
-                                  bottom: 0,
-                                  child: SearchBar(
-                                    bloc: bloc!,
-                                    theme: theme,
-                                  ))
-                            ],
-                          )),
-                      Stack(
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(
-                                height: 28,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(right: 32),
-                                child: RichText(
-                                    text: TextSpan(
-                                        style: theme.textTheme.headline4,
-                                        text: 'پروژه ها',
-                                        children: [
-                                      TextSpan(
-                                          text: '(2)',
-                                          style: theme.textTheme.headline4!
-                                              .copyWith(
-                                                  color:
-                                                      MyApp.primaryTextColor))
-                                    ])),
-                              ),
-                              ProjecList(theme: theme),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.only(right: 32, top: 8),
-                                child: RichText(
-                                    text: TextSpan(
-                                        style: theme.textTheme.headline4,
-                                        text: 'تسک ها',
-                                        children: [
-                                      TextSpan(
-                                          text: '(5)',
-                                          style: theme.textTheme.headline4!
-                                              .copyWith(
-                                                  color:
-                                                      MyApp.primaryTextColor))
-                                    ])),
-                              ),
-                              TaskList(
-                                tasks: tasks,
-                                theme: theme,
-                                bloc: bloc,
-                                scaffoldKey: scaffoldKey,
-                              ),
-                            ],
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                );
-              } else if (state is HomeLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else if (state is HomeError) {
-                return const ErrorState();
-              } else if (state is EmptyState) {
-                return const Center(
-                  child: Text('هنوز تسکی نساختی'),
-                );
-              } else {
-                throw Exception('invalid state');
-              }
-            },
-          ),
-        ));
+                                Positioned(
+                                    right: 0,
+                                    left: 0,
+                                    bottom: 0,
+                                    child: SearchBar(
+                                      focusNode: focusNode,
+                                      bloc: _homeBloc!,
+                                      theme: theme,
+                                    ))
+                              ],
+                            )),
+                        Stack(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(
+                                  height: 28,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 32),
+                                  child: RichText(
+                                      text: TextSpan(
+                                          style: theme.textTheme.headline4,
+                                          text: 'پروژه ها',
+                                          children: [
+                                        TextSpan(
+                                            text: '(2)',
+                                            style: theme.textTheme.headline4!
+                                                .copyWith(
+                                                    color:
+                                                        MyApp.primaryTextColor))
+                                      ])),
+                                ),
+                                ProjecList(theme: theme),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(right: 32, top: 8),
+                                  child: RichText(
+                                      text: TextSpan(
+                                          style: theme.textTheme.headline4,
+                                          text: 'تسک ها',
+                                          children: [
+                                        TextSpan(
+                                            text: '(5)',
+                                            style: theme.textTheme.headline4!
+                                                .copyWith(
+                                                    color:
+                                                        MyApp.primaryTextColor))
+                                      ])),
+                                ),
+                                TaskList(
+                                  tasks: tasks,
+                                  theme: theme,
+                                  bloc: _homeBloc,
+                                ),
+                              ],
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+                  );
+                } else if (state is HomeLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (state is HomeError) {
+                  return const ErrorState();
+                } else if (state is EmptyState) {
+                  return const Center(
+                    child: Text('هنوز تسکی نساختی'),
+                  );
+                } else {
+                  throw Exception('invalid state');
+                }
+              },
+            ),
+          )),
+    );
   }
 }
 

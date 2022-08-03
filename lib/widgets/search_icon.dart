@@ -13,8 +13,8 @@ class SearchIcon extends StatefulWidget {
 
 class _SearchIconState extends State<SearchIcon> {
   bool showSearch(BuildContext context) {
-    if (homeScreenController.hasClients) {
-      final scrollPosition = homeScreenController.offset;
+    if (homeScrollController.hasClients) {
+      final scrollPosition = homeScrollController.offset;
       if (scrollPosition > (MediaQuery.of(context).size.height * 0.2)) {
         return true;
       } else {
@@ -27,7 +27,7 @@ class _SearchIconState extends State<SearchIcon> {
 
   @override
   void initState() {
-    homeScreenController.addListener(
+    homeScrollController.addListener(
       () {
         setState(() {});
       },
@@ -37,7 +37,7 @@ class _SearchIconState extends State<SearchIcon> {
 
   @override
   void dispose() {
-    homeScreenController.removeListener(() {});
+    homeScrollController.removeListener(() {});
 
     super.dispose();
   }
@@ -49,13 +49,10 @@ class _SearchIconState extends State<SearchIcon> {
       scale: showSearch(context) ? 2 : 0,
       child: Visibility(
         visible: showSearch(context),
-        child: GestureDetector(
-          onTap: () {},
-          child: const Icon(
-            CupertinoIcons.search,
-            color: Colors.white,
-            size: 12,
-          ),
+        child: const Icon(
+          CupertinoIcons.search,
+          color: Colors.white,
+          size: 12,
         ),
       ),
     );
