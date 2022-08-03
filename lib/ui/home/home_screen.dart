@@ -29,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     boxListener.removeListener(() {});
+    bloc?.close();
     super.dispose();
   }
 

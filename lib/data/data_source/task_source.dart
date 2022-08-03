@@ -4,6 +4,8 @@ import 'package:hive_flutter/adapters.dart';
 abstract class ITaskDataSource {
   Future<List<TaskEntity>> getTasks(String searchKey);
 
+  TaskEntity getTask(int id);
+
   Future<TaskEntity> addOrUpdate(TaskEntity task);
 
   Future<void> delete(TaskEntity task);
@@ -45,5 +47,10 @@ class TaskDataSource implements ITaskDataSource {
     } else {
       return taskBox.values.toList();
     }
+  }
+
+  @override
+  TaskEntity getTask(int id) {
+    return taskBox.get(id)!;
   }
 }

@@ -20,4 +20,7 @@ class TaskRepository implements ITaskRepository {
   @override
   Future<List<TaskEntity>> getTasks(String searchKey) =>
       dataSource.getTasks(searchKey);
+
+  @override
+  TaskEntity getTask(int id) => dataSource.getTask(id);
 }
