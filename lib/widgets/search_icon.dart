@@ -32,6 +32,7 @@ class _SearchIconState extends State<SearchIcon> {
         setState(() {});
       },
     );
+
     super.initState();
   }
 

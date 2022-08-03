@@ -113,6 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
               builder: (context, state) {
                 if (state is HomeSuccess) {
                   final tasks = state.tasks;
+                  final taskLenght = tasks.length.toString();
                   return SingleChildScrollView(
                     controller: homeScrollController,
                     child: Column(
@@ -186,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           text: 'پروژه ها',
                                           children: [
                                         TextSpan(
-                                            text: '(2)',
+                                            text: ' (2)',
                                             style: theme.textTheme.headline4!
                                                 .copyWith(
                                                     color:
@@ -203,7 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           text: 'تسک ها',
                                           children: [
                                         TextSpan(
-                                            text: '(5)',
+                                            text: ' ($taskLenght)',
                                             style: theme.textTheme.headline4!
                                                 .copyWith(
                                                     color:
