@@ -1,6 +1,7 @@
 import 'package:easy_task/data/data_source/task_source.dart';
 import 'package:easy_task/data/repo/task_repo.dart';
 import 'package:easy_task/data/task.dart';
+
 import 'package:easy_task/ui/home/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';

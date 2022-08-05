@@ -1,5 +1,7 @@
 import 'package:easy_task/data/data_source/task_source.dart';
 import 'package:easy_task/data/task.dart';
+import 'package:easy_task/main.dart';
+import 'package:hive_flutter/adapters.dart';
 
 abstract class ITaskRepository extends ITaskDataSource {}
 
@@ -18,8 +20,12 @@ class TaskRepository implements ITaskRepository {
   Future<void> deleteAll() => dataSource.deleteAll();
 
   @override
-  List<TaskEntity> getTasks(String searchKey) => dataSource.getTasks(searchKey);
+  List<TaskEntity> getTasks(String searchKey, String date) =>
+      dataSource.getTasks(searchKey, date);
 
   @override
   TaskEntity getTask(int id) => dataSource.getTask(id);
 }
+
+final TaskRepository taskRepository =
+    TaskRepository(TaskDataSource(Hive.box<TaskEntity>(taskBoxName)));

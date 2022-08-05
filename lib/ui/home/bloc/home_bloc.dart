@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:easy_task/data/repo/task_repo.dart';
 import 'package:easy_task/data/task.dart';
 import 'package:equatable/equatable.dart';
+import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
@@ -15,13 +16,20 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       if (event is HomeStarted || event is SearchFieldClicked) {
         emit(HomeLoading());
         final String searchKey;
+        final String date;
+
         try {
           if (event is SearchFieldClicked) {
             searchKey = event.searchKey;
+            date = event.date;
+          } else if (event is HomeStarted) {
+            searchKey = '';
+            date = event.date;
           } else {
+            date = Jalali.now().formatFullDate();
             searchKey = '';
           }
-          final tasks = await taskRepository.getTasks(searchKey);
+          final tasks = await taskRepository.getTasks(searchKey, date);
           if (tasks.isEmpty && event is HomeStarted) {
             emit(EmptyState());
           } else {

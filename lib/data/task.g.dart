@@ -12,7 +12,8 @@ class TaskAdapter extends TypeAdapter<TaskEntity> {
         content: fields[1],
         tag: fields[2],
         checked: fields[3],
-        important: fields[4]);
+        important: fields[4],
+        date: fields[5]);
   }
 
   @override
@@ -21,7 +22,7 @@ class TaskAdapter extends TypeAdapter<TaskEntity> {
   @override
   void write(BinaryWriter writer, TaskEntity obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
@@ -31,7 +32,9 @@ class TaskAdapter extends TypeAdapter<TaskEntity> {
       ..writeByte(3)
       ..write(obj.checked)
       ..writeByte(4)
-      ..write(obj.important);
+      ..write(obj.important)
+      ..writeByte(5)
+      ..write(obj.date);
   }
 
   @override

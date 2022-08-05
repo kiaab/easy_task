@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:easy_task/data/repo/task_repo.dart';
 import 'package:easy_task/data/task.dart';
@@ -16,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 
 final ScrollController homeScrollController = ScrollController();
 
@@ -27,6 +29,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  Jalali picked = Jalali.now();
+
   HomeBloc? _homeBloc;
   @override
   void dispose() {
@@ -40,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     boxListener.addListener(() {
-      _homeBloc!.add(HomeStarted());
+      _homeBloc!.add(HomeStarted(picked.formatFullDate()));
     });
     super.initState();
   }
@@ -92,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => AddOrEditScreen(
-                    task: TaskEntity(),
+                    task: TaskEntity(date: Jalali.now().formatFullDate()),
                   ),
                 ),
               );
@@ -105,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
           body: BlocProvider<HomeBloc>(
             create: (context) {
               final bloc = HomeBloc(taskRepository: getIt<TaskRepository>());
-              bloc.add(HomeStarted());
+              bloc.add(HomeStarted(picked.formatFullDate()));
               _homeBloc = bloc;
               return bloc;
             },
@@ -148,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           height: 2,
                                         ),
                                         Text(
-                                          '12/5/1401 ',
+                                          Jalali.now().formatFullDate(),
                                           style: theme.textTheme.headline6!
                                               .copyWith(
                                                   color: Colors.white
@@ -168,6 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       focusNode: focusNode,
                                       bloc: _homeBloc!,
                                       theme: theme,
+                                      date: picked.formatFullDate(),
                                     ))
                               ],
                             )),
@@ -196,20 +201,43 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 ProjecList(theme: theme),
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(right: 32, top: 8),
-                                  child: RichText(
-                                      text: TextSpan(
-                                          style: theme.textTheme.headline4,
-                                          text: 'تسک ها',
-                                          children: [
-                                        TextSpan(
-                                            text: ' ($taskLenght)',
-                                            style: theme.textTheme.headline4!
-                                                .copyWith(
-                                                    color:
-                                                        MyApp.primaryTextColor))
-                                      ])),
+                                  padding: const EdgeInsets.only(
+                                      right: 32, top: 8, left: 32, bottom: 12),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      RichText(
+                                          text: TextSpan(
+                                              style: theme.textTheme.headline4,
+                                              text: 'تسک ها',
+                                              children: [
+                                            TextSpan(
+                                                text: ' ($taskLenght)',
+                                                style: theme
+                                                    .textTheme.headline4!
+                                                    .copyWith(
+                                                        color: MyApp
+                                                            .primaryTextColor))
+                                          ])),
+                                      InkWell(
+                                        onTap: () async {
+                                          picked = await showPersianDatePicker(
+                                                  initialEntryMode:
+                                                      DatePickerEntryMode
+                                                          .calendar,
+                                                  context: context,
+                                                  initialDate: Jalali.now(),
+                                                  firstDate: Jalali(1390),
+                                                  lastDate: Jalali(1450)) ??
+                                              Jalali.now();
+                                          _homeBloc?.add(HomeStarted(
+                                              picked.formatFullDate()));
+                                        },
+                                        child: Text(picked.formatFullDate()),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                                 TaskList(
                                   tasks: tasks,
@@ -254,7 +282,7 @@ class ProjecList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 150,
+      height: 160,
       child: ListView.builder(
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.only(left: 32, right: 32, bottom: 10),
@@ -279,9 +307,9 @@ class ProjecList extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+                  padding: const EdgeInsets.fromLTRB(14, 12, 12, 14),
                   width: 200,
-                  height: 140,
+                  height: 160,
                   margin: EdgeInsets.fromLTRB(
                       index == 1 ? 0 : 8, 12, index == 0 ? 0 : 8, 12),
                   decoration: BoxDecoration(
@@ -300,11 +328,14 @@ class ProjecList extends StatelessWidget {
                         height: 8,
                       ),
                       Text(
-                        'تسک های انجام شده :',
+                        ' انجام شده:',
                         style: theme.textTheme.caption,
                       ),
+                      SizedBox(
+                        height: 2,
+                      ),
                       Text(
-                        'تسک های باقی مانده :',
+                        ' باقی مانده :',
                         style: theme.textTheme.caption,
                       ),
                       const SizedBox(
@@ -318,7 +349,7 @@ class ProjecList extends StatelessWidget {
                         backgroundColor: Colors.white,
                       ),
                       const SizedBox(
-                        height: 2,
+                        height: 3,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,

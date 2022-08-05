@@ -2,7 +2,7 @@ import 'package:easy_task/data/task.dart';
 import 'package:hive_flutter/adapters.dart';
 
 abstract class ITaskDataSource {
-  List<TaskEntity> getTasks(String searchKey);
+  List<TaskEntity> getTasks(String searchKey, String date);
 
   TaskEntity getTask(int id);
 
@@ -38,14 +38,15 @@ class TaskDataSource implements ITaskDataSource {
   }
 
   @override
-  List<TaskEntity> getTasks(String searchKey) {
+  List<TaskEntity> getTasks(String searchKey, String date) {
     if (searchKey.isNotEmpty) {
       return taskBox.values.where((element) {
-        return element.title.contains(searchKey) ||
-            element.tag.contains(searchKey);
+        return (element.title.contains(searchKey) ||
+                element.tag.contains(searchKey)) &&
+            element.date == date;
       }).toList();
     } else {
-      return taskBox.values.toList();
+      return taskBox.values.where((element) => element.date == date).toList();
     }
   }
 

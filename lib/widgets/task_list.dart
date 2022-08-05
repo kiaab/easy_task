@@ -7,7 +7,6 @@ import 'package:easy_task/ui/home/bloc/home_bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
 class TaskList extends StatelessWidget {
   const TaskList({
@@ -19,7 +18,7 @@ class TaskList extends StatelessWidget {
 
   final List<TaskEntity> tasks;
   final ThemeData theme;
-  final HomeBloc? bloc;
+  final Bloc? bloc;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +37,7 @@ class TaskList extends StatelessWidget {
                 visible: task.important,
                 child: Container(
                   height: 60,
-                  margin: const EdgeInsets.fromLTRB(32, 8, 32, 8),
+                  margin: const EdgeInsets.fromLTRB(32, 4, 32, 4),
                   decoration: BoxDecoration(
                       color: checked ? null : Colors.red,
                       borderRadius: BorderRadius.circular(12)),
@@ -68,7 +67,7 @@ class TaskList extends StatelessWidget {
                   height: 60,
                   padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
                   margin: EdgeInsets.fromLTRB(
-                      32, 8, task.important && !checked ? 36 : 32, 8),
+                      32, 4, task.important && !checked ? 36 : 32, 4),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                       color: checked
@@ -91,7 +90,9 @@ class TaskList extends StatelessWidget {
                           GestureDetector(
                             onTap: () {
                               task.important = !task.important;
-                              bloc?.add(UpdateTask(task));
+                              if (bloc is HomeBloc) {
+                                bloc?.add(UpdateTask(task));
+                              }
                             },
                             child: Icon(
                               task.important
@@ -122,7 +123,9 @@ class TaskList extends StatelessWidget {
                               value: checked,
                               onChanged: (value) {
                                 task.checked = value!;
-                                bloc!.add(UpdateTask(task));
+                                if (bloc is HomeBloc && bloc != null) {
+                                  bloc?.add(UpdateTask(task));
+                                }
                               })
                         ],
                       ),

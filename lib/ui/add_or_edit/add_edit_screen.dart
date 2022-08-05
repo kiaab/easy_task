@@ -5,18 +5,32 @@ import 'package:easy_task/ui/add_or_edit/bloc/add_or_edit_bloc.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 
-class AddOrEditScreen extends StatelessWidget {
+class AddOrEditScreen extends StatefulWidget {
   const AddOrEditScreen({Key? key, required this.task}) : super(key: key);
   final TaskEntity task;
+
+  @override
+  State<AddOrEditScreen> createState() => _AddOrEditScreenState();
+}
+
+class _AddOrEditScreenState extends State<AddOrEditScreen> {
+  String picked = '';
+  @override
+  void initState() {
+    picked = widget.task.date;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final TextEditingController titleTextController =
-        TextEditingController(text: task.title);
+        TextEditingController(text: widget.task.title);
     final TextEditingController contentTextController =
-        TextEditingController(text: task.content);
+        TextEditingController(text: widget.task.content);
     final TextEditingController tagTextController =
-        TextEditingController(text: task.tag);
+        TextEditingController(text: widget.task.tag);
     final ThemeData theme = Theme.of(context);
     return Theme(
       data: Theme.of(context).copyWith(
@@ -44,13 +58,14 @@ class AddOrEditScreen extends StatelessWidget {
                   backgroundColor: theme.colorScheme.primary,
                   onPressed: () {
                     if (titleTextController.text.isNotEmpty) {
-                      task.title = titleTextController.text;
-                      task.content = contentTextController.text;
-                      task.tag = tagTextController.text;
+                      widget.task.title = titleTextController.text;
+                      widget.task.content = contentTextController.text;
+                      widget.task.tag = tagTextController.text;
 
-                      task.important = _important!;
+                      widget.task.date = picked;
+
                       BlocProvider.of<AddOrEditBloc>(context)
-                          .add(SaveButtonClicked(task));
+                          .add(SaveButtonClicked(widget.task));
                       Navigator.pop(context);
                     } else {
                       BlocProvider.of<AddOrEditBloc>(context)
@@ -117,7 +132,17 @@ class AddOrEditScreen extends StatelessWidget {
                           ),
                           Row(
                             children: [
-                              ImportantCheckBox(theme: theme),
+                              Checkbox(
+                                  side: BorderSide(
+                                      color: theme.colorScheme.primary,
+                                      width: 2),
+                                  activeColor: theme.colorScheme.primary,
+                                  value: widget.task.important,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      widget.task.important = value!;
+                                    });
+                                  }),
                               const Text('ضروری')
                             ],
                           ),
@@ -132,6 +157,41 @@ class AddOrEditScreen extends StatelessWidget {
                                       .withOpacity(0.4)),
                             ),
                           ),
+                          SizedBox(
+                            height: 16,
+                          ),
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text('انتخاب تاریخ'),
+                                InkWell(
+                                  borderRadius: BorderRadius.circular(12),
+                                  onTap: () async {
+                                    final jalaliPicked =
+                                        await showPersianDatePicker(
+                                                context: context,
+                                                initialDate: Jalali.now(),
+                                                firstDate: Jalali(1390),
+                                                lastDate: Jalali(1450)) ??
+                                            widget.task.date;
+                                    if (jalaliPicked is Jalali) {
+                                      picked = jalaliPicked.formatFullDate();
+                                    }
+
+                                    setState(() {});
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: theme.colorScheme.primary),
+                                        borderRadius:
+                                            BorderRadius.circular(12)),
+                                    child: Text(picked),
+                                  ),
+                                ),
+                              ])
                         ],
                       ),
                     )),
@@ -141,34 +201,5 @@ class AddOrEditScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-bool? _important = false;
-
-class ImportantCheckBox extends StatefulWidget {
-  const ImportantCheckBox({
-    Key? key,
-    required this.theme,
-  }) : super(key: key);
-
-  final ThemeData theme;
-
-  @override
-  State<ImportantCheckBox> createState() => _ImportantCheckBoxState();
-}
-
-class _ImportantCheckBoxState extends State<ImportantCheckBox> {
-  @override
-  Widget build(BuildContext context) {
-    return Checkbox(
-        side: BorderSide(color: widget.theme.colorScheme.primary, width: 2),
-        activeColor: widget.theme.colorScheme.primary,
-        value: _important,
-        onChanged: (value) {
-          setState(() {
-            _important = value;
-          });
-        });
   }
 }

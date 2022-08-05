@@ -7,12 +7,22 @@ abstract class HomeEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class HomeStarted extends HomeEvent {}
+class HomeStarted extends HomeEvent {
+  final String date;
+
+  const HomeStarted(this.date);
+
+  @override
+  List<Object> get props => [date];
+}
 
 class SearchFieldClicked extends HomeEvent {
   final String searchKey;
+  final String date;
+  const SearchFieldClicked(this.date, {this.searchKey = ''});
 
-  const SearchFieldClicked([this.searchKey = '']);
+  @override
+  List<Object> get props => [date];
 }
 
 class UpdateTask extends HomeEvent {

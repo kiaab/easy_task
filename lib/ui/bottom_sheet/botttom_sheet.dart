@@ -97,7 +97,7 @@ class _TaskBottomSheetState extends State<TaskBottomSheet> {
             Text(widget.task.content),
             SizedBox(height: 12),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Icon(
                   CupertinoIcons.trash,
