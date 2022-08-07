@@ -16,6 +16,8 @@ class TaskEntity extends HiveObject {
   bool important;
   @HiveField(5)
   String date;
+  @HiveField(6)
+  String projectName;
 
   TaskEntity(
       {this.title = '',
@@ -23,5 +25,6 @@ class TaskEntity extends HiveObject {
       this.tag = '',
       this.checked = false,
       this.important = false,
-      this.date = ''});
+      this.date = '',
+      this.projectName = ''});
 }

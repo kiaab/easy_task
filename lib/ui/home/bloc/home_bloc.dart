@@ -29,7 +29,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             date = Jalali.now().formatFullDate();
             searchKey = '';
           }
-          final tasks = await taskRepository.getTasks(searchKey, date);
+          final tasks = taskRepository.getTasks(searchKey, date, '');
           if (tasks.isEmpty && event is HomeStarted) {
             emit(EmptyState());
           } else {
@@ -40,6 +40,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         }
       } else if (event is UpdateTask) {
         taskRepository.addOrUpdate(event.task);
+      } else if (event is DeleteTask) {
+        taskRepository.delete(event.task);
       }
     });
   }

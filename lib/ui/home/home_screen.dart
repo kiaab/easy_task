@@ -6,7 +6,9 @@ import 'package:easy_task/data/task.dart';
 import 'package:easy_task/main.dart';
 import 'package:easy_task/ui/add_or_edit/add_edit_screen.dart';
 import 'package:easy_task/ui/home/bloc/home_bloc.dart';
+import 'package:easy_task/ui/project/project.dart';
 import 'package:easy_task/widgets/error_state.dart';
+import 'package:easy_task/widgets/project_list.dart';
 import 'package:easy_task/widgets/search_bar.dart';
 import 'package:easy_task/widgets/search_icon.dart';
 import 'package:easy_task/widgets/task_list.dart';
@@ -50,6 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   final FocusNode focusNode = FocusNode();
+  List<String> projects = [];
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -96,7 +99,8 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => AddOrEditScreen(
-                    task: TaskEntity(date: Jalali.now().formatFullDate()),
+                    projects: projects,
+                    task: TaskEntity(date: picked.formatFullDate()),
                   ),
                 ),
               );
@@ -116,8 +120,21 @@ class _HomeScreenState extends State<HomeScreen> {
             child: BlocBuilder<HomeBloc, HomeState>(
               builder: (context, state) {
                 if (state is HomeSuccess) {
-                  final tasks = state.tasks;
+                  final tasks = state.tasks
+                      .where(
+                          (element) => element.date == picked.formatFullDate())
+                      .toList();
                   final taskLenght = tasks.length.toString();
+
+                  if (projects.isEmpty) {
+                    for (var e in state.tasks) {
+                      if (e.projectName.isNotEmpty &&
+                          !projects.contains(e.projectName)) {
+                        projects.add(e.projectName);
+                      }
+                    }
+                  }
+                  final projectLenght = projects.length.toString();
                   return SingleChildScrollView(
                     controller: homeScrollController,
                     child: Column(
@@ -192,14 +209,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                           text: 'پروژه ها',
                                           children: [
                                         TextSpan(
-                                            text: ' (2)',
+                                            text: ' ($projectLenght)',
                                             style: theme.textTheme.headline4!
                                                 .copyWith(
                                                     color:
                                                         MyApp.primaryTextColor))
                                       ])),
                                 ),
-                                ProjecList(theme: theme),
+                                ProjecList(
+                                  tasks: state.tasks,
+                                  theme: theme,
+                                  projects: projects,
+                                ),
                                 Padding(
                                   padding: const EdgeInsets.only(
                                       right: 32, top: 8, left: 32, bottom: 12),
@@ -230,7 +251,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   initialDate: Jalali.now(),
                                                   firstDate: Jalali(1390),
                                                   lastDate: Jalali(1450)) ??
-                                              Jalali.now();
+                                              picked;
                                           _homeBloc?.add(HomeStarted(
                                               picked.formatFullDate()));
                                         },
@@ -240,6 +261,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                                 TaskList(
+                                  projects: projects,
                                   tasks: tasks,
                                   theme: theme,
                                   bloc: _homeBloc,
@@ -267,109 +289,6 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
           )),
-    );
-  }
-}
-
-class ProjecList extends StatelessWidget {
-  const ProjecList({
-    Key? key,
-    required this.theme,
-  }) : super(key: key);
-
-  final ThemeData theme;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 160,
-      child: ListView.builder(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.only(left: 32, right: 32, bottom: 10),
-          scrollDirection: Axis.horizontal,
-          itemCount: 2,
-          itemBuilder: (contex, index) {
-            return Stack(
-              children: [
-                Positioned.fill(
-                  bottom: 6,
-                  top: 60,
-                  left: 28,
-                  right: 28,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                            color: theme.colorScheme.primary.withOpacity(0.4),
-                            blurRadius: 10)
-                      ],
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.fromLTRB(14, 12, 12, 14),
-                  width: 200,
-                  height: 160,
-                  margin: EdgeInsets.fromLTRB(
-                      index == 1 ? 0 : 8, 12, index == 0 ? 0 : 8, 12),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'پروژه اندروید',
-                        style: theme.textTheme.headline4!
-                            .copyWith(fontSize: 14, color: Colors.white),
-                      ),
-                      const SizedBox(
-                        height: 8,
-                      ),
-                      Text(
-                        ' انجام شده:',
-                        style: theme.textTheme.caption,
-                      ),
-                      SizedBox(
-                        height: 2,
-                      ),
-                      Text(
-                        ' باقی مانده :',
-                        style: theme.textTheme.caption,
-                      ),
-                      const SizedBox(
-                        height: 16,
-                      ),
-                      LinearPercentIndicator(
-                        barRadius: const Radius.circular(12),
-                        padding: EdgeInsets.zero,
-                        percent: 0.5,
-                        progressColor: theme.colorScheme.secondary,
-                        backgroundColor: Colors.white,
-                      ),
-                      const SizedBox(
-                        height: 3,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'پیشرفت',
-                            style: theme.textTheme.caption,
-                          ),
-                          Text(
-                            '20%',
-                            style: theme.textTheme.caption,
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            );
-          }),
     );
   }
 }

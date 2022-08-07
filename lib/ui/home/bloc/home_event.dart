@@ -32,3 +32,11 @@ class UpdateTask extends HomeEvent {
   @override
   List<Object> get props => [task];
 }
+
+class DeleteTask extends HomeEvent {
+  final TaskEntity task;
+
+  const DeleteTask(this.task);
+  @override
+  List<Object> get props => [task];
+}
