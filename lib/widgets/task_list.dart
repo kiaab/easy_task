@@ -4,34 +4,49 @@ import 'package:easy_task/main.dart';
 import 'package:easy_task/ui/add_or_edit/add_edit_screen.dart';
 import 'package:easy_task/ui/bottom_sheet/botttom_sheet.dart';
 import 'package:easy_task/ui/home/bloc/home_bloc.dart';
+import 'package:easy_task/ui/home/home_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class TaskList extends StatelessWidget {
+class TaskList extends StatefulWidget {
   const TaskList({
     Key? key,
     required this.tasks,
     required this.theme,
     required this.bloc,
     required this.projects,
+    required this.tags,
   }) : super(key: key);
 
   final List<TaskEntity> tasks;
   final ThemeData theme;
   final Bloc? bloc;
   final List<String> projects;
+  final List<String> tags;
 
+  @override
+  State<TaskList> createState() => _TaskListState();
+}
+
+class _TaskListState extends State<TaskList> {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-        padding: const EdgeInsets.only(bottom: 60),
+        padding: const EdgeInsets.only(bottom: 70),
         physics: const BouncingScrollPhysics(),
         shrinkWrap: true,
         itemExtent: 90,
-        itemCount: tasks.length,
+        itemCount: widget.tasks.length,
         itemBuilder: (context, index) {
-          final task = tasks[index];
+          for (var element in widget.tasks) {
+            if (element.important == true) {
+              widget.tasks.remove(element);
+              widget.tasks.insert(0, element);
+            }
+          }
+
+          final task = widget.tasks[index];
           bool? checked = task.checked;
           return Stack(
             children: [
@@ -49,8 +64,9 @@ class TaskList extends StatelessWidget {
                 onLongPress: () {
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => AddOrEditScreen(
-                            projects: projects,
+                            projects: widget.projects,
                             task: task,
+                            tags: widget.tags,
                           )));
                 },
                 onTap: () {
@@ -62,7 +78,7 @@ class TaskList extends StatelessWidget {
                       builder: (context) {
                         return TaskBottomSheet(
                           task: task,
-                          theme: theme,
+                          theme: widget.theme,
                         );
                       });
                 },
@@ -74,12 +90,12 @@ class TaskList extends StatelessWidget {
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                       color: checked
-                          ? theme.colorScheme.secondary.withOpacity(0.2)
+                          ? widget.theme.colorScheme.secondary.withOpacity(0.2)
                           : Colors.white,
                       border: checked
                           ? Border.all(
-                              color:
-                                  theme.colorScheme.secondary.withOpacity(0.2))
+                              color: widget.theme.colorScheme.secondary
+                                  .withOpacity(0.2))
                           : Border.all(
                               color: task.important
                                   ? Colors.red
@@ -94,8 +110,8 @@ class TaskList extends StatelessWidget {
                           GestureDetector(
                             onTap: () {
                               task.important = !task.important;
-                              if (bloc is HomeBloc) {
-                                bloc?.add(UpdateTask(task));
+                              if (widget.bloc is HomeBloc) {
+                                widget.bloc?.add(UpdateTask(task));
                               } else {
                                 getIt<TaskRepository>().addOrUpdate(task);
                               }
@@ -126,13 +142,15 @@ class TaskList extends StatelessWidget {
                           ),
                           Checkbox(
                               side: BorderSide(
-                                  color: theme.colorScheme.secondary, width: 2),
-                              activeColor: theme.colorScheme.secondary,
+                                  color: widget.theme.colorScheme.secondary,
+                                  width: 2),
+                              activeColor: widget.theme.colorScheme.secondary,
                               value: checked,
                               onChanged: (value) {
                                 task.checked = value!;
-                                if (bloc is HomeBloc && bloc != null) {
-                                  bloc?.add(UpdateTask(task));
+                                if (widget.bloc is HomeBloc &&
+                                    widget.bloc != null) {
+                                  widget.bloc?.add(UpdateTask(task));
                                 } else {
                                   getIt<TaskRepository>().addOrUpdate(task);
                                 }
@@ -148,7 +166,7 @@ class TaskList extends StatelessWidget {
                               padding: const EdgeInsets.only(bottom: 4),
                               child: Text(
                                 task.projectName,
-                                style: theme.textTheme.bodyText1!
+                                style: widget.theme.textTheme.bodyText1!
                                     .copyWith(fontSize: 14),
                               ),
                             ),
@@ -165,32 +183,44 @@ class TaskList extends StatelessWidget {
                                         child: AlertDialog(
                                           title: Text(
                                             'آیا از حذف خود مطمعن هستید',
-                                            style: theme.textTheme.headline4,
+                                            style: widget
+                                                .theme.textTheme.headline4,
                                           ),
                                           actions: [
                                             TextButton(
                                               onPressed: () {
-                                                if (bloc is HomeBloc) {
-                                                  bloc?.add(DeleteTask(task));
+                                                if (widget.bloc is HomeBloc) {
+                                                  widget.bloc
+                                                      ?.add(DeleteTask([task]));
+                                                  deleteProjectName(task);
+                                                  deleteTagName(task);
                                                 } else {
                                                   getIt<TaskRepository>()
                                                       .delete(task);
+                                                  if (widget.tasks.length ==
+                                                      1) {
+                                                    widget.projects.remove(
+                                                        task.projectName);
+                                                    widget.tasks.clear();
+                                                  }
                                                 }
+
+                                                Navigator.pop(context);
                                               },
-                                              child: Text('بله'),
+                                              child: const Text('بله'),
                                             ),
                                             TextButton(
                                               onPressed: () {
                                                 Navigator.pop(context);
                                               },
-                                              child: Text('خیر'),
+                                              child: const Text('خیر'),
                                             )
                                           ],
                                         ),
                                       );
                                     });
                               },
-                              child: Icon(
+                              child: const Icon(
                                 CupertinoIcons.trash,
                                 color: Colors.red,
                                 size: 20,
@@ -206,5 +236,26 @@ class TaskList extends StatelessWidget {
             ],
           );
         });
+  }
+
+  void deleteProjectName(TaskEntity task) {
+    if (task.projectName.isNotEmpty) {
+      final pTasks = widget.tasks
+          .where((element) => element.projectName == task.projectName)
+          .toList();
+      if (pTasks.length == 1) {
+        widget.projects.remove(task.projectName);
+      }
+    }
+  }
+
+  void deleteTagName(TaskEntity task) {
+    if (task.tag.isNotEmpty) {
+      final tagTasks = widget.tasks.where((element) => element.tag == task.tag);
+      if (tagTasks.length == 1) {
+        tags.remove(task.tag);
+        selectedTag = '';
+      }
+    }
   }
 }

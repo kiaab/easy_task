@@ -9,10 +9,12 @@ class ProjectScreen extends StatefulWidget {
     Key? key,
     required this.tasks,
     required this.projectNames,
+    required this.tags,
   }) : super(key: key);
 
   final List<TaskEntity> tasks;
   final List<String> projectNames;
+  final List<String> tags;
 
   @override
   State<ProjectScreen> createState() => _ProjectScreenState();
@@ -31,6 +33,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
         builder: (context, value, child) => Padding(
           padding: const EdgeInsets.only(top: 16),
           child: TaskList(
+              tags: widget.tags,
               tasks: widget.tasks,
               theme: Theme.of(context),
               bloc: null,

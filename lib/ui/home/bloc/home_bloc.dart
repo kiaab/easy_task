@@ -41,7 +41,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       } else if (event is UpdateTask) {
         taskRepository.addOrUpdate(event.task);
       } else if (event is DeleteTask) {
-        taskRepository.delete(event.task);
+        for (var e in event.task) {
+          taskRepository.delete(e);
+        }
+      } else if (event is DeleteAll) {
+        taskRepository.deleteAll();
       }
     });
   }

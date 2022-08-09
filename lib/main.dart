@@ -1,7 +1,5 @@
-import 'package:easy_task/data/data_source/project_source.dart';
 import 'package:easy_task/data/data_source/task_source.dart';
-import 'package:easy_task/data/projec/project.dart';
-import 'package:easy_task/data/repo/project_repo.dart';
+
 import 'package:easy_task/data/repo/task_repo.dart';
 import 'package:easy_task/data/task.dart';
 
@@ -11,20 +9,14 @@ import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/adapters.dart';
 
 const taskBoxName = 'taskBox';
-const projectBoxName = 'projectBox';
+
 final GetIt getIt = GetIt.instance;
 void main() async {
   await Hive.initFlutter();
 
   Hive.registerAdapter(TaskAdapter());
-  Hive.registerAdapter(ProjectAdapter());
 
-  await Hive.openBox<ProjectEntity>(projectBoxName);
   await Hive.openBox<TaskEntity>(taskBoxName);
-
-  getIt.registerSingleton(
-      ProjectDataSource(Hive.box<ProjectEntity>(projectBoxName)));
-  getIt.registerSingleton(ProjectRepository(getIt<ProjectDataSource>()));
 
   getIt.registerSingleton(TaskDataSource(Hive.box<TaskEntity>(taskBoxName)));
   getIt.registerSingleton(TaskRepository(getIt<TaskDataSource>()));
@@ -57,7 +49,7 @@ class _MyAppState extends State<MyApp> {
           ),
           scaffoldBackgroundColor: Colors.white,
           textTheme: TextTheme(
-            bodyText2: TextStyle(
+            bodyText2: const TextStyle(
                 fontFamily: MyApp.fontFamily, color: MyApp.primaryTextColor),
             headline6: TextStyle(
                 fontFamily: MyApp.fontFamily,

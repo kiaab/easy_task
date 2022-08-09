@@ -1,19 +1,25 @@
 import 'package:easy_task/data/task.dart';
+import 'package:easy_task/ui/home/bloc/home_bloc.dart';
+import 'package:easy_task/ui/home/home_screen.dart';
 import 'package:easy_task/ui/project/project.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
-class ProjecList extends StatelessWidget {
-  const ProjecList({
+class ProjectList extends StatelessWidget {
+  const ProjectList({
     Key? key,
     required this.theme,
-    required this.projects,
+    required HomeBloc? homeBloc,
     required this.tasks,
-  }) : super(key: key);
+    required this.tags,
+  })  : _homeBloc = homeBloc,
+        super(key: key);
 
   final ThemeData theme;
-  final List<String> projects;
+  final HomeBloc? _homeBloc;
   final List<TaskEntity> tasks;
+  final List<String> tags;
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +49,7 @@ class ProjecList extends StatelessWidget {
                   builder: (contex) => Directionality(
                       textDirection: TextDirection.rtl,
                       child: ProjectScreen(
+                        tags: tags,
                         tasks: projectTasks,
                         projectNames: projects,
                       )))),
@@ -76,12 +83,58 @@ class ProjecList extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          projectName,
-                          style: theme.textTheme.headline4!
-                              .copyWith(fontSize: 14, color: Colors.white),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              projectName,
+                              style: theme.textTheme.headline4!
+                                  .copyWith(fontSize: 14, color: Colors.white),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return Directionality(
+                                        textDirection: TextDirection.rtl,
+                                        child: AlertDialog(
+                                          title: Text(
+                                            'آیا از حذف خود مطمعن هستید',
+                                            style: theme.textTheme.headline4,
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                _homeBloc?.add(
+                                                    DeleteTask(projectTasks));
+                                                projects.removeAt(index);
+
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text('بله'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text('خیر'),
+                                            )
+                                          ],
+                                        ),
+                                      );
+                                    });
+                              },
+                              child: Icon(
+                                CupertinoIcons.delete,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            )
+                          ],
                         ),
                         const SizedBox(
                           height: 8,

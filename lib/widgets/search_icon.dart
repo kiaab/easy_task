@@ -52,7 +52,6 @@ class _SearchIconState extends State<SearchIcon> {
         visible: showSearch(context),
         child: const Icon(
           CupertinoIcons.search,
-          color: Colors.white,
           size: 12,
         ),
       ),

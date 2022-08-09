@@ -2,6 +2,9 @@ import 'package:easy_task/data/repo/task_repo.dart';
 import 'package:easy_task/data/task.dart';
 import 'package:easy_task/main.dart';
 import 'package:easy_task/ui/add_or_edit/bloc/add_or_edit_bloc.dart';
+
+import 'package:easy_task/utils.dart';
+import 'package:easy_task/widgets/tag_list.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
@@ -9,33 +12,71 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 
 class AddOrEditScreen extends StatefulWidget {
-  const AddOrEditScreen({Key? key, required this.task, required this.projects})
+  const AddOrEditScreen(
+      {Key? key,
+      required this.task,
+      required this.projects,
+      required this.tags})
       : super(key: key);
   final TaskEntity task;
   final List<String> projects;
+  final List<String> tags;
 
   @override
   State<AddOrEditScreen> createState() => _AddOrEditScreenState();
 }
 
-class _AddOrEditScreenState extends State<AddOrEditScreen> {
+class _AddOrEditScreenState extends State<AddOrEditScreen>
+    with WidgetsBindingObserver {
+  final FocusNode titleFocusNode = FocusNode();
+  final FocusNode tagFocusNode = FocusNode();
+  final FocusNode contentFocusNode = FocusNode();
+  final FocusNode projectFocusNode = FocusNode();
+
   String picked = '';
   @override
   void initState() {
     picked = widget.task.date;
+    WidgetsBinding.instance.addObserver(this);
     super.initState();
+  }
+
+  @override
+  void didChangeMetrics() {
+    final value = WidgetsBinding.instance.window.viewInsets.bottom;
+    if (value == 0) {
+      titleFocusNode.unfocus();
+      tagFocusNode.unfocus();
+      contentFocusNode.unfocus();
+      projectFocusNode.unfocus();
+    }
+    super.didChangeMetrics();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    titleFocusNode.dispose();
+    tagFocusNode.dispose();
+    contentFocusNode.dispose();
+    projectFocusNode.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final TextEditingController titleTextController =
         TextEditingController(text: widget.task.title);
+
     final TextEditingController contentTextController =
         TextEditingController(text: widget.task.content);
+
     final TextEditingController tagTextController =
         TextEditingController(text: widget.task.tag);
+
     final TextEditingController projectTextController =
         TextEditingController(text: widget.task.projectName);
+
     final ThemeData theme = Theme.of(context);
     return Theme(
       data: Theme.of(context).copyWith(
@@ -68,7 +109,8 @@ class _AddOrEditScreenState extends State<AddOrEditScreen> {
                       widget.task.tag = tagTextController.text;
                       widget.task.projectName = projectTextController.text;
                       widget.task.date = picked;
-
+                      checkedProjectIsInListAndAdd(projectTextController.text);
+                      checkedTagIsInListAndAdd(tagTextController.text);
                       BlocProvider.of<AddOrEditBloc>(context)
                           .add(SaveButtonClicked(widget.task));
                       Navigator.pop(context);
@@ -90,11 +132,12 @@ class _AddOrEditScreenState extends State<AddOrEditScreen> {
                 body: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(28, 16, 28, 26),
+                      padding: const EdgeInsets.fromLTRB(28, 16, 28, 80),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           TextField(
+                            focusNode: titleFocusNode,
                             maxLength: 40,
                             controller: titleTextController,
                             decoration: state is AddOrEditError
@@ -127,6 +170,7 @@ class _AddOrEditScreenState extends State<AddOrEditScreen> {
                             height: 12,
                           ),
                           TextField(
+                            focusNode: tagFocusNode,
                             maxLength: 25,
                             controller: tagTextController,
                             decoration: InputDecoration(
@@ -137,6 +181,12 @@ class _AddOrEditScreenState extends State<AddOrEditScreen> {
                                       .withOpacity(0.4)),
                             ),
                           ),
+
+                          //Tag list
+                          TagList(
+                              tags: widget.tags,
+                              tagTextController: tagTextController),
+
                           Row(
                             children: [
                               Checkbox(
@@ -154,6 +204,7 @@ class _AddOrEditScreenState extends State<AddOrEditScreen> {
                             ],
                           ),
                           TextField(
+                            focusNode: contentFocusNode,
                             maxLines: 4,
                             keyboardType: TextInputType.multiline,
                             controller: contentTextController,
@@ -237,6 +288,7 @@ class _AddOrEditScreenState extends State<AddOrEditScreen> {
                                 height: 12,
                               ),
                               TextField(
+                                focusNode: projectFocusNode,
                                 maxLength: 35,
                                 controller: projectTextController,
                                 decoration: InputDecoration(
