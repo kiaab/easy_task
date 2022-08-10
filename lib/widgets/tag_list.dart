@@ -23,7 +23,7 @@ class TagList extends StatelessWidget {
       child: ListView.builder(
           scrollDirection: Axis.horizontal,
           itemCount: tags.length,
-          padding: EdgeInsets.fromLTRB(32, 0, 32, 4),
+          padding: EdgeInsets.fromLTRB(28, 0, 28, 4),
           itemBuilder: (context, index) {
             final tagName = tags[index];
             return InkWell(

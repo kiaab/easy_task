@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:easy_task/data/repo/task_repo.dart';
 import 'package:easy_task/data/task.dart';
 import 'package:easy_task/main.dart';
+import 'package:easy_task/onboarding/onboarding.dart';
 import 'package:easy_task/ui/add_or_edit/add_edit_screen.dart';
 import 'package:easy_task/ui/home/bloc/home_bloc.dart';
 import 'package:easy_task/ui/project/project.dart';
@@ -19,6 +20,7 @@ import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
@@ -65,11 +67,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       _homeBloc!.add(HomeStarted(picked.formatFullDate()));
     });
     WidgetsBinding.instance.addObserver(this);
+
     super.initState();
   }
 
   final FocusNode focusNode = FocusNode();
   List<TaskEntity> tasks = [];
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -201,15 +205,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 //tasks for current date
 
                 if (selectedTag.isEmpty) {
-                  tasks = state.tasks
+                  tasks = state.tasksSearch
                       .where(
                           (element) => element.date == picked.formatFullDate())
                       .toList();
                 } else {
-                  tasks = state.tasks
-                      .where((element) =>
-                          element.date == picked.formatFullDate() &&
-                          element.tag == selectedTag)
+                  tasks = state.tasksSearch
+                      .where((element) => element.tag == selectedTag)
                       .toList();
                 }
 
@@ -244,12 +246,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        'سلام کیا',
-                                        style: theme.textTheme.headline6!
-                                            .copyWith(
-                                                fontSize: 22,
-                                                color: Colors.white),
+                                      Visibility(
+                                        visible: name.isNotEmpty,
+                                        child: Text(
+                                          'سلام $name',
+                                          style: theme.textTheme.headline6!
+                                              .copyWith(
+                                                  fontSize: 22,
+                                                  color: Colors.white),
+                                          maxLines: 1,
+                                        ),
                                       ),
                                       const SizedBox(
                                         height: 2,
@@ -290,7 +296,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                               Visibility(
                                 visible: projects.isNotEmpty,
                                 child: Padding(
-                                  padding: const EdgeInsets.only(right: 32),
+                                  padding: const EdgeInsets.only(
+                                      right: 32, left: 32),
                                   child: RichText(
                                       text: TextSpan(
                                           style: theme.textTheme.headline4,
@@ -364,9 +371,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                             EdgeInsets.fromLTRB(32, 0, 32, 4),
                                         itemBuilder: (context, index) {
                                           final tagName = tags[index];
-                                          return InkWell(
-                                            borderRadius:
-                                                BorderRadius.circular(18),
+                                          return GestureDetector(
                                             onTap: () {
                                               _homeBloc?.add(HomeStarted(
                                                   picked.formatFullDate()));
@@ -422,6 +427,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      SvgPicture.asset(
+                        'assets/icon/no_data.svg',
+                        width: 130,
+                        height: 130,
+                      ),
+                      const SizedBox(
+                        height: 16,
+                      ),
                       Text(
                         'هنوز تسکی نساختی',
                         style:

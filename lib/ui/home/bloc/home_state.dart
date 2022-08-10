@@ -11,8 +11,9 @@ class HomeLoading extends HomeState {}
 
 class HomeSuccess extends HomeState {
   final List<TaskEntity> tasks;
+  final List<TaskEntity> tasksSearch;
 
-  const HomeSuccess(this.tasks);
+  const HomeSuccess(this.tasks, this.tasksSearch);
   @override
   List<Object> get props => [tasks];
 }

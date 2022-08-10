@@ -20,8 +20,7 @@ class TaskRepository implements ITaskRepository {
   Future<void> deleteAll() => dataSource.deleteAll();
 
   @override
-  List<TaskEntity> getTasks(String searchKey, String date, String project) =>
-      dataSource.getTasks(searchKey, date, project);
+  List<TaskEntity> getTasks() => dataSource.getTasks();
 
   @override
   TaskEntity getTask(int id) => dataSource.getTask(id);

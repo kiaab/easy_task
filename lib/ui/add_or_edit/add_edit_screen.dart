@@ -132,53 +132,63 @@ class _AddOrEditScreenState extends State<AddOrEditScreen>
                 body: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(28, 16, 28, 80),
+                      padding: const EdgeInsets.only(bottom: 75, top: 16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TextField(
-                            focusNode: titleFocusNode,
-                            maxLength: 40,
-                            controller: titleTextController,
-                            decoration: state is AddOrEditError
-                                ? InputDecoration(
-                                    enabled: true,
-                                    focusedErrorBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide: const BorderSide(
-                                            color: Colors.red, width: 2)),
-                                    errorBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide: const BorderSide(
-                                            color: Colors.red)),
-                                    errorText: 'عنوان نمیتواند خالی باشد',
-                                    hintText: ' عنوان : مثالا شرکت در جلسه',
-                                    hintStyle: theme.textTheme.bodyText1!
-                                        .copyWith(
-                                            color: MyApp.secondaryTextColor
-                                                .withOpacity(0.4)),
-                                  )
-                                : InputDecoration(
-                                    hintText: ' عنوان : مثالا شرکت در جلسه',
-                                    hintStyle: theme.textTheme.bodyText1!
-                                        .copyWith(
-                                            color: MyApp.secondaryTextColor
-                                                .withOpacity(0.4)),
-                                  ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(left: 28.0, right: 28),
+                            child: TextField(
+                              focusNode: titleFocusNode,
+                              maxLength: 40,
+                              controller: titleTextController,
+                              decoration: state is AddOrEditError
+                                  ? InputDecoration(
+                                      enabled: true,
+                                      focusedErrorBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          borderSide: const BorderSide(
+                                              color: Colors.red, width: 2)),
+                                      errorBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          borderSide: const BorderSide(
+                                              color: Colors.red)),
+                                      errorText: 'عنوان نمیتواند خالی باشد',
+                                      hintText: ' عنوان : مثالا شرکت در جلسه',
+                                      hintStyle: theme.textTheme.bodyText1!
+                                          .copyWith(
+                                              color: MyApp.secondaryTextColor
+                                                  .withOpacity(0.4)),
+                                    )
+                                  : InputDecoration(
+                                      hintText: ' عنوان : مثالا شرکت در جلسه',
+                                      hintStyle: theme.textTheme.bodyText1!
+                                          .copyWith(
+                                              color: MyApp.secondaryTextColor
+                                                  .withOpacity(0.4)),
+                                    ),
+                            ),
                           ),
                           const SizedBox(
                             height: 12,
                           ),
-                          TextField(
-                            focusNode: tagFocusNode,
-                            maxLength: 25,
-                            controller: tagTextController,
-                            decoration: InputDecoration(
-                              hintText:
-                                  ' برچسب : با برچسب تسکاتو راحتر پیدا کن',
-                              hintStyle: theme.textTheme.bodyText1!.copyWith(
-                                  color: MyApp.secondaryTextColor
-                                      .withOpacity(0.4)),
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(left: 28.0, right: 28),
+                            child: TextField(
+                              focusNode: tagFocusNode,
+                              maxLength: 25,
+                              controller: tagTextController,
+                              decoration: InputDecoration(
+                                hintText:
+                                    ' برچسب : با برچسب تسکاتو راحتر پیدا کن',
+                                hintStyle: theme.textTheme.bodyText1!.copyWith(
+                                    color: MyApp.secondaryTextColor
+                                        .withOpacity(0.4)),
+                              ),
                             ),
                           ),
 
@@ -187,123 +197,144 @@ class _AddOrEditScreenState extends State<AddOrEditScreen>
                               tags: widget.tags,
                               tagTextController: tagTextController),
 
-                          Row(
-                            children: [
-                              Checkbox(
-                                  side: BorderSide(
-                                      color: theme.colorScheme.primary,
-                                      width: 2),
-                                  activeColor: theme.colorScheme.primary,
-                                  value: widget.task.important,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      widget.task.important = value!;
-                                    });
-                                  }),
-                              const Text('ضروری')
-                            ],
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(left: 28.0, right: 16),
+                            child: Row(
+                              children: [
+                                Checkbox(
+                                    side: BorderSide(
+                                        color: theme.colorScheme.primary,
+                                        width: 2),
+                                    activeColor: theme.colorScheme.primary,
+                                    value: widget.task.important,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        widget.task.important = value!;
+                                      });
+                                    }),
+                                const Text('ضروری')
+                              ],
+                            ),
                           ),
-                          TextField(
-                            focusNode: contentFocusNode,
-                            maxLines: 4,
-                            keyboardType: TextInputType.multiline,
-                            controller: contentTextController,
-                            decoration: InputDecoration(
-                              hintText:
-                                  'توضیحات : مثلا امروز باید در جلسه طراحی محصول را توضیح بدم',
-                              hintStyle: theme.textTheme.bodyText1!.copyWith(
-                                  color: MyApp.secondaryTextColor
-                                      .withOpacity(0.4)),
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(left: 28.0, right: 28),
+                            child: TextField(
+                              focusNode: contentFocusNode,
+                              maxLines: 4,
+                              keyboardType: TextInputType.multiline,
+                              controller: contentTextController,
+                              decoration: InputDecoration(
+                                hintText:
+                                    'توضیحات : مثلا امروز باید در جلسه طراحی محصول را توضیح بدم',
+                                hintStyle: theme.textTheme.bodyText1!.copyWith(
+                                    color: MyApp.secondaryTextColor
+                                        .withOpacity(0.4)),
+                              ),
                             ),
                           ),
                           SizedBox(
                             height: 16,
                           ),
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'انتخاب تاریخ',
-                                  style: theme.textTheme.bodyText1!
-                                      .copyWith(fontSize: 16),
-                                ),
-                                InkWell(
-                                  borderRadius: BorderRadius.circular(12),
-                                  onTap: () async {
-                                    final jalaliPicked =
-                                        await showPersianDatePicker(
-                                                context: context,
-                                                initialDate: Jalali.now(),
-                                                firstDate: Jalali(1390),
-                                                lastDate: Jalali(1450)) ??
-                                            widget.task.date;
-                                    if (jalaliPicked is Jalali) {
-                                      picked = jalaliPicked.formatFullDate();
-                                    }
-
-                                    setState(() {});
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            bottom: BorderSide(
-                                                color: theme
-                                                    .colorScheme.primary))),
-                                    child: Text(picked),
-                                  ),
-                                ),
-                              ]),
-                          SizedBox(
-                            height: 16,
-                          ),
-                          Column(
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.end,
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(left: 28.0, right: 28),
+                            child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Text(
-                                    'پروژه',
+                                    'انتخاب تاریخ',
                                     style: theme.textTheme.bodyText1!
                                         .copyWith(fontSize: 16),
                                   ),
-                                  SizedBox(
-                                    width: 16,
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.all(2),
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: theme.colorScheme.primary),
-                                    child: Icon(
-                                      CupertinoIcons.plus,
-                                      color: Colors.white,
-                                      size: 15,
+                                  InkWell(
+                                    borderRadius: BorderRadius.circular(12),
+                                    onTap: () async {
+                                      final jalaliPicked =
+                                          await showPersianDatePicker(
+                                                  context: context,
+                                                  initialDate: Jalali.now(),
+                                                  firstDate: Jalali(1390),
+                                                  lastDate: Jalali(1450)) ??
+                                              widget.task.date;
+                                      if (jalaliPicked is Jalali) {
+                                        picked = jalaliPicked.formatFullDate();
+                                      }
+
+                                      setState(() {});
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                          border: Border(
+                                              bottom: BorderSide(
+                                                  color: theme
+                                                      .colorScheme.primary))),
+                                      child: Text(picked),
                                     ),
                                   ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 12,
-                              ),
-                              TextField(
-                                focusNode: projectFocusNode,
-                                maxLength: 35,
-                                controller: projectTextController,
-                                decoration: InputDecoration(
-                                  hintText: ' پروژه :',
-                                  hintStyle: theme.textTheme.bodyText1!
-                                      .copyWith(
-                                          color: MyApp.secondaryTextColor
-                                              .withOpacity(0.4)),
+                                ]),
+                          ),
+                          SizedBox(
+                            height: 16,
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(left: 28.0, right: 28),
+                            child: Column(
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      'پروژه',
+                                      style: theme.textTheme.bodyText1!
+                                          .copyWith(fontSize: 16),
+                                    ),
+                                    SizedBox(
+                                      width: 16,
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.all(2),
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: theme.colorScheme.primary),
+                                      child: Icon(
+                                        CupertinoIcons.plus,
+                                        color: Colors.white,
+                                        size: 15,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
+                                SizedBox(
+                                  height: 12,
+                                ),
+                                TextField(
+                                  focusNode: projectFocusNode,
+                                  maxLength: 35,
+                                  controller: projectTextController,
+                                  decoration: InputDecoration(
+                                    hintText: ' پروژه :',
+                                    hintStyle: theme.textTheme.bodyText1!
+                                        .copyWith(
+                                            color: MyApp.secondaryTextColor
+                                                .withOpacity(0.4)),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                           SizedBox(
                             height: 50,
                             child: ListView.builder(
+                                padding: EdgeInsets.only(
+                                  left: 28,
+                                  right: 28,
+                                ),
                                 scrollDirection: Axis.horizontal,
                                 itemCount: widget.projects.length,
                                 itemBuilder: (context, index) {
@@ -315,7 +346,13 @@ class _AddOrEditScreenState extends State<AddOrEditScreen>
                                     },
                                     child: Container(
                                       padding: EdgeInsets.all(8),
-                                      margin: EdgeInsets.all(8),
+                                      margin: EdgeInsets.fromLTRB(
+                                          index == widget.projects.length - 1
+                                              ? 0
+                                              : 8,
+                                          8,
+                                          index == 0 ? 0 : 8,
+                                          4),
                                       decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(18),

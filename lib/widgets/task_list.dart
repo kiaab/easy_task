@@ -197,12 +197,14 @@ class _TaskListState extends State<TaskList> {
                                                 } else {
                                                   getIt<TaskRepository>()
                                                       .delete(task);
+
                                                   if (widget.tasks.length ==
                                                       1) {
-                                                    widget.projects.remove(
+                                                    projects.remove(
                                                         task.projectName);
                                                     widget.tasks.clear();
                                                   }
+                                                  widget.tasks.remove(task);
                                                 }
 
                                                 Navigator.pop(context);

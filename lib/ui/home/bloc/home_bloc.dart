@@ -29,11 +29,19 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             date = Jalali.now().formatFullDate();
             searchKey = '';
           }
-          final tasks = taskRepository.getTasks(searchKey, date, '');
+          final tasks = taskRepository.getTasks();
+          final List<TaskEntity> tasksSearch;
+          if (searchKey.isNotEmpty) {
+            tasksSearch = tasks
+                .where((element) => element.title.contains(searchKey))
+                .toList();
+          } else {
+            tasksSearch = tasks;
+          }
           if (tasks.isEmpty && event is HomeStarted) {
             emit(EmptyState());
           } else {
-            emit(HomeSuccess(tasks));
+            emit(HomeSuccess(tasks, tasksSearch));
           }
         } catch (e) {
           emit(HomeError());
