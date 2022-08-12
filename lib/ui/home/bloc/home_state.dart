@@ -1,21 +1,29 @@
 part of 'home_bloc.dart';
 
-abstract class HomeState extends Equatable {
+abstract class HomeState {
   const HomeState();
-
-  @override
-  List<Object> get props => [];
 }
 
 class HomeLoading extends HomeState {}
 
 class HomeSuccess extends HomeState {
   final List<TaskEntity> tasks;
+
+  final List<String> projects;
+  final List<String> tags;
+
+  const HomeSuccess(
+    this.tasks,
+    this.projects,
+    this.tags,
+  );
+}
+
+class HomeSuccessSearch extends HomeState {
+  final List<TaskEntity> tasks;
   final List<TaskEntity> tasksSearch;
 
-  const HomeSuccess(this.tasks, this.tasksSearch);
-  @override
-  List<Object> get props => [tasks];
+  const HomeSuccessSearch(this.tasks, this.tasksSearch);
 }
 
 class HomeError extends HomeState {}

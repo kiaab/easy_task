@@ -1,29 +1,21 @@
-import 'package:easy_task/data/repo/task_repo.dart';
 import 'package:easy_task/data/task.dart';
 import 'package:easy_task/main.dart';
 import 'package:easy_task/ui/add_or_edit/add_edit_screen.dart';
 import 'package:easy_task/ui/bottom_sheet/botttom_sheet.dart';
 import 'package:easy_task/ui/home/bloc/home_bloc.dart';
-import 'package:easy_task/ui/home/home_screen.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TaskList extends StatefulWidget {
   const TaskList({
     Key? key,
     required this.tasks,
     required this.theme,
-    required this.bloc,
-    required this.projects,
-    required this.tags,
   }) : super(key: key);
 
   final List<TaskEntity> tasks;
   final ThemeData theme;
-  final Bloc? bloc;
-  final List<String> projects;
-  final List<String> tags;
 
   @override
   State<TaskList> createState() => _TaskListState();
@@ -32,21 +24,23 @@ class TaskList extends StatefulWidget {
 class _TaskListState extends State<TaskList> {
   @override
   Widget build(BuildContext context) {
+    final tasks = widget.tasks;
+    final theme = widget.theme;
     return ListView.builder(
         padding: const EdgeInsets.only(bottom: 70),
         physics: const BouncingScrollPhysics(),
         shrinkWrap: true,
         itemExtent: 90,
-        itemCount: widget.tasks.length,
+        itemCount: tasks.length,
         itemBuilder: (context, index) {
-          for (var element in widget.tasks) {
+          for (var element in tasks) {
             if (element.important == true) {
-              widget.tasks.remove(element);
-              widget.tasks.insert(0, element);
+              tasks.remove(element);
+              tasks.insert(0, element);
             }
           }
 
-          final task = widget.tasks[index];
+          final task = tasks[index];
           bool? checked = task.checked;
           return Stack(
             children: [
@@ -64,9 +58,8 @@ class _TaskListState extends State<TaskList> {
                 onLongPress: () {
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => AddOrEditScreen(
-                            projects: widget.projects,
+                            homeBloc: getIt<HomeBloc>(),
                             task: task,
-                            tags: widget.tags,
                           )));
                 },
                 onTap: () {
@@ -78,7 +71,7 @@ class _TaskListState extends State<TaskList> {
                       builder: (context) {
                         return TaskBottomSheet(
                           task: task,
-                          theme: widget.theme,
+                          theme: theme,
                         );
                       });
                 },
@@ -90,12 +83,12 @@ class _TaskListState extends State<TaskList> {
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                       color: checked
-                          ? widget.theme.colorScheme.secondary.withOpacity(0.2)
+                          ? theme.colorScheme.secondary.withOpacity(0.2)
                           : Colors.white,
                       border: checked
                           ? Border.all(
-                              color: widget.theme.colorScheme.secondary
-                                  .withOpacity(0.2))
+                              color:
+                                  theme.colorScheme.secondary.withOpacity(0.2))
                           : Border.all(
                               color: task.important
                                   ? Colors.red
@@ -110,11 +103,8 @@ class _TaskListState extends State<TaskList> {
                           GestureDetector(
                             onTap: () {
                               task.important = !task.important;
-                              if (widget.bloc is HomeBloc) {
-                                widget.bloc?.add(UpdateTask(task));
-                              } else {
-                                getIt<TaskRepository>().addOrUpdate(task);
-                              }
+
+                              getIt<HomeBloc>().add(AddOrUpdateTask(task));
                             },
                             child: Icon(
                               task.important
@@ -142,18 +132,13 @@ class _TaskListState extends State<TaskList> {
                           ),
                           Checkbox(
                               side: BorderSide(
-                                  color: widget.theme.colorScheme.secondary,
-                                  width: 2),
-                              activeColor: widget.theme.colorScheme.secondary,
-                              value: checked,
+                                  color: theme.colorScheme.secondary, width: 2),
+                              activeColor: theme.colorScheme.secondary,
+                              value: task.checked,
                               onChanged: (value) {
                                 task.checked = value!;
-                                if (widget.bloc is HomeBloc &&
-                                    widget.bloc != null) {
-                                  widget.bloc?.add(UpdateTask(task));
-                                } else {
-                                  getIt<TaskRepository>().addOrUpdate(task);
-                                }
+
+                                getIt<HomeBloc>().add(AddOrUpdateTask(task));
                               })
                         ],
                       ),
@@ -166,7 +151,7 @@ class _TaskListState extends State<TaskList> {
                               padding: const EdgeInsets.only(bottom: 4),
                               child: Text(
                                 task.projectName,
-                                style: widget.theme.textTheme.bodyText1!
+                                style: theme.textTheme.bodyText1!
                                     .copyWith(fontSize: 14),
                               ),
                             ),
@@ -183,29 +168,13 @@ class _TaskListState extends State<TaskList> {
                                         child: AlertDialog(
                                           title: Text(
                                             'آیا از حذف خود مطمعن هستید',
-                                            style: widget
-                                                .theme.textTheme.headline4,
+                                            style: theme.textTheme.headline4,
                                           ),
                                           actions: [
                                             TextButton(
                                               onPressed: () {
-                                                if (widget.bloc is HomeBloc) {
-                                                  widget.bloc
-                                                      ?.add(DeleteTask([task]));
-                                                  deleteProjectName(task);
-                                                  deleteTagName(task);
-                                                } else {
-                                                  getIt<TaskRepository>()
-                                                      .delete(task);
-
-                                                  if (widget.tasks.length ==
-                                                      1) {
-                                                    projects.remove(
-                                                        task.projectName);
-                                                    widget.tasks.clear();
-                                                  }
-                                                  widget.tasks.remove(task);
-                                                }
+                                                getIt<HomeBloc>()
+                                                    .add(DeleteTask(task));
 
                                                 Navigator.pop(context);
                                               },
@@ -238,26 +207,5 @@ class _TaskListState extends State<TaskList> {
             ],
           );
         });
-  }
-
-  void deleteProjectName(TaskEntity task) {
-    if (task.projectName.isNotEmpty) {
-      final pTasks = widget.tasks
-          .where((element) => element.projectName == task.projectName)
-          .toList();
-      if (pTasks.length == 1) {
-        widget.projects.remove(task.projectName);
-      }
-    }
-  }
-
-  void deleteTagName(TaskEntity task) {
-    if (task.tag.isNotEmpty) {
-      final tagTasks = widget.tasks.where((element) => element.tag == task.tag);
-      if (tagTasks.length == 1) {
-        tags.remove(task.tag);
-        selectedTag = '';
-      }
-    }
   }
 }

@@ -1,46 +1,39 @@
 part of 'home_bloc.dart';
 
-abstract class HomeEvent extends Equatable {
+abstract class HomeEvent {
   const HomeEvent();
-
-  @override
-  List<Object> get props => [];
 }
 
-class HomeStarted extends HomeEvent {
-  final String date;
-
-  const HomeStarted(this.date);
-
-  @override
-  List<Object> get props => [date];
-}
+class HomeStarted extends HomeEvent {}
 
 class SearchFieldClicked extends HomeEvent {
   final String searchKey;
-  final String date;
-  const SearchFieldClicked(this.date, {this.searchKey = ''});
 
-  @override
-  List<Object> get props => [date];
+  const SearchFieldClicked({this.searchKey = ''});
 }
 
-class UpdateTask extends HomeEvent {
+class AddOrUpdateTask extends HomeEvent {
   final TaskEntity task;
 
-  const UpdateTask(this.task);
-  @override
-  List<Object> get props => [task];
+  const AddOrUpdateTask(this.task);
 }
 
 class DeleteTask extends HomeEvent {
-  final List<TaskEntity> task;
+  final TaskEntity task;
 
   const DeleteTask(this.task);
-  @override
-  List<Object> get props => [task];
 }
 
 class DeleteAll extends HomeEvent {}
 
-class TagClicked extends HomeEvent {}
+class TagClicked extends HomeEvent {
+  final String selectedTag;
+
+  const TagClicked(this.selectedTag);
+}
+
+class DeleteAllProjectTasks extends HomeEvent {
+  final List<TaskEntity> tasks;
+
+  const DeleteAllProjectTasks(this.tasks);
+}

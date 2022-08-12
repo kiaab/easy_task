@@ -1,5 +1,5 @@
 import 'package:easy_task/ui/home/bloc/home_bloc.dart';
-import 'package:easy_task/ui/home/home_screen.dart';
+
 import 'package:flutter/material.dart';
 
 class TagList extends StatelessWidget {
@@ -31,9 +31,6 @@ class TagList extends StatelessWidget {
               onTap: () {
                 if (tagTextController != null) {
                   tagTextController?.text = tagName;
-                } else {
-                  selectedTag = tagName;
-                  bloc?.add(HomeStarted(pickedDate!));
                 }
               },
               child: Container(

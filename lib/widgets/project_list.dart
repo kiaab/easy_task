@@ -1,6 +1,6 @@
 import 'package:easy_task/data/task.dart';
 import 'package:easy_task/ui/home/bloc/home_bloc.dart';
-import 'package:easy_task/ui/home/home_screen.dart';
+
 import 'package:easy_task/ui/project/project.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,16 +10,16 @@ class ProjectList extends StatelessWidget {
   const ProjectList({
     Key? key,
     required this.theme,
-    required HomeBloc? homeBloc,
+    required this.homeBloc,
     required this.tasks,
-    required this.tags,
-  })  : _homeBloc = homeBloc,
-        super(key: key);
+    required this.projects,
+  }) : super(key: key);
 
   final ThemeData theme;
-  final HomeBloc? _homeBloc;
+  final HomeBloc? homeBloc;
   final List<TaskEntity> tasks;
-  final List<String> tags;
+
+  final List<String> projects;
 
   @override
   Widget build(BuildContext context) {
@@ -49,9 +49,7 @@ class ProjectList extends StatelessWidget {
                   builder: (contex) => Directionality(
                       textDirection: TextDirection.rtl,
                       child: ProjectScreen(
-                        tags: tags,
                         tasks: projectTasks,
-                        projectNames: projects,
                       )))),
               child: Stack(
                 children: [
@@ -109,9 +107,9 @@ class ProjectList extends StatelessWidget {
                                           actions: [
                                             TextButton(
                                               onPressed: () {
-                                                _homeBloc?.add(
-                                                    DeleteTask(projectTasks));
-                                                projects.removeAt(index);
+                                                homeBloc?.add(
+                                                    DeleteAllProjectTasks(
+                                                        projectTasks));
 
                                                 Navigator.pop(context);
                                               },

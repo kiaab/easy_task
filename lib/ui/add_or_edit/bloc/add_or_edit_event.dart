@@ -7,12 +7,4 @@ abstract class AddOrEditEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class SaveButtonClicked extends AddOrEditEvent {
-  final TaskEntity task;
-
-  const SaveButtonClicked(this.task);
-  @override
-  List<Object> get props => [task];
-}
-
-class TitleFieldIsEmpty extends AddOrEditEvent {}
+class EditStarted extends AddOrEditEvent {}

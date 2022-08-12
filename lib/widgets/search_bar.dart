@@ -10,13 +10,12 @@ class SearchBar extends StatelessWidget {
     required this.theme,
     required this.bloc,
     required this.focusNode,
-    required this.date,
   }) : super(key: key);
 
   final ThemeData theme;
   final HomeBloc? bloc;
   final FocusNode focusNode;
-  final String date;
+
   @override
   Widget build(BuildContext context) {
     final TextEditingController searchController =
@@ -33,7 +32,7 @@ class SearchBar extends StatelessWidget {
           keyboardType: TextInputType.text,
           focusNode: focusNode,
           onChanged: (value) {
-            bloc?.add(SearchFieldClicked(date, searchKey: value));
+            bloc?.add(SearchFieldClicked(searchKey: value));
           },
           decoration: InputDecoration(
             fillColor: Colors.white,

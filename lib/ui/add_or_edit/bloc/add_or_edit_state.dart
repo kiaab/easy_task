@@ -9,4 +9,12 @@ abstract class AddOrEditState extends Equatable {
 
 class AddOrEditInitial extends AddOrEditState {}
 
-class AddOrEditError extends AddOrEditState {}
+class EditSuccess extends AddOrEditState {
+  final List<String> projects;
+  final List<String> tags;
+
+  const EditSuccess(this.projects, this.tags);
+
+  @override
+  List<Object> get props => [projects, tags];
+}
