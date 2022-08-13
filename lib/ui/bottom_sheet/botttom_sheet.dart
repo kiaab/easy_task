@@ -1,9 +1,11 @@
 import 'package:easy_task/data/repo/task_repo.dart';
 import 'package:easy_task/data/task.dart';
 import 'package:easy_task/main.dart';
+import 'package:easy_task/ui/add_or_edit/add_edit_screen.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 
 class TaskBottomSheet extends StatefulWidget {
   const TaskBottomSheet({
@@ -24,11 +26,11 @@ class _TaskBottomSheetState extends State<TaskBottomSheet> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Container(
-        padding: EdgeInsets.fromLTRB(32, 16, 32, 12),
-        height: MediaQuery.of(context).size.height * 0.3,
-        decoration: BoxDecoration(
+        padding: const EdgeInsets.fromLTRB(32, 16, 32, 12),
+        height: MediaQuery.of(context).size.height * 0.4,
+        decoration: const BoxDecoration(
             borderRadius: BorderRadius.vertical(
-              top: Radius.circular(36),
+              top: const Radius.circular(36),
             ),
             color: Colors.white),
         child: Column(
@@ -54,7 +56,7 @@ class _TaskBottomSheetState extends State<TaskBottomSheet> {
                         : MyApp.primaryTextColor,
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 8,
                 ),
                 Expanded(
@@ -82,7 +84,7 @@ class _TaskBottomSheetState extends State<TaskBottomSheet> {
             Visibility(
               visible: widget.task.tag.isNotEmpty,
               child: Container(
-                padding: EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(18),
                     color: Colors.grey.shade200),
@@ -91,19 +93,66 @@ class _TaskBottomSheetState extends State<TaskBottomSheet> {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 8,
             ),
-            Text(widget.task.content),
-            SizedBox(height: 12),
+            Expanded(child: Text(widget.task.content)),
+            const SizedBox(height: 12),
             Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(
-                  CupertinoIcons.trash,
-                  color: Colors.red,
+                InkWell(
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) =>
+                          AddOrEditScreen(task: widget.task))),
+                  child: Icon(
+                    Icons.edit,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return Directionality(
+                            textDirection: TextDirection.rtl,
+                            child: AlertDialog(
+                              title: Text(
+                                'انتقال تسک به تاریخ فعلی ؟',
+                                style: widget.theme.textTheme.headline4,
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    widget.task.date =
+                                        Jalali.now().formatFullDate();
+                                    getIt<TaskRepository>()
+                                        .addOrUpdate(widget.task);
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('بله'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('خیر'),
+                                )
+                              ],
+                            ),
+                          );
+                        });
+                  },
+                  child: Icon(
+                    CupertinoIcons.arrowshape_turn_up_left,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
               ],
+            ),
+            const SizedBox(
+              height: 12,
             )
           ],
         ),

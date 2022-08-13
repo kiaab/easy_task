@@ -8,3 +8,12 @@ abstract class AddOrEditEvent extends Equatable {
 }
 
 class EditStarted extends AddOrEditEvent {}
+
+class Save extends AddOrEditEvent {
+  final TaskEntity task;
+
+  const Save(this.task);
+
+  @override
+  List<Object> get props => [task];
+}

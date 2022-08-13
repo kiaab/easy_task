@@ -157,6 +157,9 @@ class ProjectList extends StatelessWidget {
                           percent: done / total,
                           progressColor: theme.colorScheme.secondary,
                           backgroundColor: Colors.white,
+                          animation: true,
+                          animateFromLastPercent: true,
+                          curve: Curves.decelerate,
                         ),
                         const SizedBox(
                           height: 3,

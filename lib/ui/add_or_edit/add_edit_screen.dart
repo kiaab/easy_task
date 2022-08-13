@@ -4,21 +4,18 @@ import 'package:easy_task/main.dart';
 import 'package:easy_task/ui/add_or_edit/bloc/add_or_edit_bloc.dart';
 import 'package:easy_task/ui/home/bloc/home_bloc.dart';
 
-import 'package:easy_task/utils.dart';
 import 'package:easy_task/widgets/tag_list.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:get_it/get_it.dart';
+
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 
 class AddOrEditScreen extends StatefulWidget {
-  const AddOrEditScreen({Key? key, required this.task, required this.homeBloc})
-      : super(key: key);
+  const AddOrEditScreen({Key? key, required this.task}) : super(key: key);
   final TaskEntity task;
-
-  final HomeBloc? homeBloc;
 
   @override
   State<AddOrEditScreen> createState() => _AddOrEditScreenState();
@@ -63,6 +60,7 @@ class _AddOrEditScreenState extends State<AddOrEditScreen>
     super.dispose();
   }
 
+  AddOrEditBloc? editBloc;
   @override
   Widget build(BuildContext context) {
     final TextEditingController titleTextController =
@@ -78,22 +76,22 @@ class _AddOrEditScreenState extends State<AddOrEditScreen>
         TextEditingController(text: widget.task.projectName);
 
     final ThemeData theme = Theme.of(context);
-    return Theme(
-      data: Theme.of(context).copyWith(
-          inputDecorationTheme: InputDecorationTheme(
-              focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide:
-                      BorderSide(color: theme.colorScheme.primary, width: 2)),
-              enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: theme.colorScheme.primary)))),
-      child: BlocProvider<AddOrEditBloc>(
-        create: (context) {
-          final bloc = AddOrEditBloc(getIt<TaskRepository>())
-            ..add(EditStarted());
-          return bloc;
-        },
+    return BlocProvider<AddOrEditBloc>(
+      create: (context) {
+        final bloc = AddOrEditBloc(getIt<TaskRepository>())..add(EditStarted());
+        editBloc = bloc;
+        return bloc;
+      },
+      child: Theme(
+        data: Theme.of(context).copyWith(
+            inputDecorationTheme: InputDecorationTheme(
+                focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide:
+                        BorderSide(color: theme.colorScheme.primary, width: 2)),
+                enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: theme.colorScheme.primary)))),
         child: Directionality(
           textDirection: TextDirection.rtl,
           child: Scaffold(
@@ -109,7 +107,7 @@ class _AddOrEditScreenState extends State<AddOrEditScreen>
                   widget.task.projectName = projectTextController.text;
                   widget.task.date = picked;
 
-                  widget.homeBloc?.add(AddOrUpdateTask(widget.task));
+                  editBloc?.add(Save(widget.task));
                   Navigator.pop(context);
                 } else {
                   setState(() {
@@ -143,6 +141,7 @@ class _AddOrEditScreenState extends State<AddOrEditScreen>
                               padding:
                                   const EdgeInsets.only(left: 28.0, right: 28),
                               child: TextField(
+                                style: theme.textTheme.bodyText2,
                                 focusNode: titleFocusNode,
                                 maxLength: 40,
                                 controller: titleTextController,
@@ -182,6 +181,7 @@ class _AddOrEditScreenState extends State<AddOrEditScreen>
                               padding:
                                   const EdgeInsets.only(left: 28.0, right: 28),
                               child: TextField(
+                                style: theme.textTheme.bodyText2,
                                 focusNode: tagFocusNode,
                                 maxLength: 25,
                                 controller: tagTextController,
@@ -228,6 +228,8 @@ class _AddOrEditScreenState extends State<AddOrEditScreen>
                               padding:
                                   const EdgeInsets.only(left: 28.0, right: 28),
                               child: TextField(
+                                style: theme.textTheme.bodyText2,
+                                maxLength: 200,
                                 focusNode: contentFocusNode,
                                 maxLines: 4,
                                 keyboardType: TextInputType.multiline,
@@ -323,6 +325,7 @@ class _AddOrEditScreenState extends State<AddOrEditScreen>
                                     height: 12,
                                   ),
                                   TextField(
+                                    style: theme.textTheme.bodyText2,
                                     focusNode: projectFocusNode,
                                     maxLength: 35,
                                     controller: projectTextController,

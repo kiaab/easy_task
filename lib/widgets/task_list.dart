@@ -27,7 +27,7 @@ class _TaskListState extends State<TaskList> {
     final tasks = widget.tasks;
     final theme = widget.theme;
     return ListView.builder(
-        padding: const EdgeInsets.only(bottom: 70),
+        padding: const EdgeInsets.only(bottom: 75),
         physics: const BouncingScrollPhysics(),
         shrinkWrap: true,
         itemExtent: 90,
@@ -46,11 +46,13 @@ class _TaskListState extends State<TaskList> {
             children: [
               Visibility(
                 visible: task.important,
-                child: Container(
+                child: AnimatedContainer(
+                  curve: Curves.linear,
+                  duration: Duration(milliseconds: 350),
                   height: 90,
-                  margin: const EdgeInsets.fromLTRB(32, 4, 32, 2),
+                  margin: const EdgeInsets.fromLTRB(32, 4, 32, 4),
                   decoration: BoxDecoration(
-                      color: checked ? null : Colors.red,
+                      color: checked ? Colors.white : Colors.red,
                       borderRadius: BorderRadius.circular(12)),
                 ),
               ),
@@ -58,7 +60,6 @@ class _TaskListState extends State<TaskList> {
                 onLongPress: () {
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => AddOrEditScreen(
-                            homeBloc: getIt<HomeBloc>(),
                             task: task,
                           )));
                 },
@@ -75,7 +76,9 @@ class _TaskListState extends State<TaskList> {
                         );
                       });
                 },
-                child: Container(
+                child: AnimatedContainer(
+                  curve: Curves.linear,
+                  duration: Duration(milliseconds: 350),
                   height: 90,
                   padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
                   margin: EdgeInsets.fromLTRB(

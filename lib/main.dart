@@ -6,6 +6,7 @@ import 'package:easy_task/onboarding/onboarding.dart';
 
 import 'package:easy_task/ui/home/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/adapters.dart';
 
@@ -28,6 +29,9 @@ void main() async {
   getIt.registerSingleton(TaskDataSource(Hive.box<TaskEntity>(taskBoxName)));
   getIt.registerSingleton(TaskRepository(getIt<TaskDataSource>()));
 
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Color(0xFF0d12d7),
+      systemNavigationBarColor: Colors.white));
   runApp(const MyApp());
 }
 

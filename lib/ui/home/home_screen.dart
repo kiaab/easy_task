@@ -177,7 +177,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => AddOrEditScreen(
-                  homeBloc: _homeBloc,
                   task: TaskEntity(date: picked.formatFullDate()),
                 ),
               ),
@@ -268,7 +267,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                 bottom: 0,
                                 child: SearchBar(
                                   focusNode: focusNode,
-                                  bloc: _homeBloc!,
                                   theme: theme,
                                 ))
                           ],
@@ -365,20 +363,23 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                                   : selectedTag = tagName;
                                             });
                                           },
-                                          child: Container(
+                                          child: AnimatedContainer(
+                                            curve: Curves.bounceInOut,
+                                            duration:
+                                                Duration(milliseconds: 400),
                                             padding: EdgeInsets.all(8),
                                             margin: EdgeInsets.fromLTRB(
                                                 index == tags.length - 1
                                                     ? 0
                                                     : 8,
-                                                4,
+                                                0,
                                                 index == 0 ? 0 : 8,
                                                 4),
                                             decoration: BoxDecoration(
                                                 borderRadius:
                                                     BorderRadius.circular(18),
                                                 color: selectedTag == tagName
-                                                    ? Colors.grey.shade200
+                                                    ? Colors.grey.shade300
                                                     : Colors.grey.shade50),
                                             child: Text(
                                               tagName,

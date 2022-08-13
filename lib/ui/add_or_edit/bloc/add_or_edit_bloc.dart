@@ -22,6 +22,8 @@ class AddOrEditBloc extends Bloc<AddOrEditEvent, AddOrEditState> {
         List<String> projects = [];
         getProjects(projects, tasks);
         emit(EditSuccess(projects, tags));
+      } else if (event is Save) {
+        taskRepository.addOrUpdate(event.task);
       }
     });
   }
