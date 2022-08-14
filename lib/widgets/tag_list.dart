@@ -21,9 +21,10 @@ class TagList extends StatelessWidget {
     return SizedBox(
       height: 50,
       child: ListView.builder(
+          physics: const BouncingScrollPhysics(),
           scrollDirection: Axis.horizontal,
           itemCount: tags.length,
-          padding: EdgeInsets.fromLTRB(28, 0, 28, 4),
+          padding: const EdgeInsets.fromLTRB(28, 0, 28, 4),
           itemBuilder: (context, index) {
             final tagName = tags[index];
             return InkWell(
@@ -34,7 +35,7 @@ class TagList extends StatelessWidget {
                 }
               },
               child: Container(
-                padding: EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
                 margin: EdgeInsets.fromLTRB(
                     index == tags.length - 1 ? 0 : 8, 4, index == 0 ? 0 : 8, 4),
                 decoration: BoxDecoration(

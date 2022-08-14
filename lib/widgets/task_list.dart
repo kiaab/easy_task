@@ -48,7 +48,7 @@ class _TaskListState extends State<TaskList> {
                 visible: task.important,
                 child: AnimatedContainer(
                   curve: Curves.linear,
-                  duration: Duration(milliseconds: 350),
+                  duration: const Duration(milliseconds: 350),
                   height: 90,
                   margin: const EdgeInsets.fromLTRB(32, 4, 32, 4),
                   decoration: BoxDecoration(
@@ -78,7 +78,7 @@ class _TaskListState extends State<TaskList> {
                 },
                 child: AnimatedContainer(
                   curve: Curves.linear,
-                  duration: Duration(milliseconds: 350),
+                  duration: const Duration(milliseconds: 350),
                   height: 90,
                   padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
                   margin: EdgeInsets.fromLTRB(

@@ -49,7 +49,7 @@ class ProjectList extends StatelessWidget {
                   builder: (contex) => Directionality(
                       textDirection: TextDirection.rtl,
                       child: ProjectScreen(
-                        tasks: projectTasks,
+                        projectName: projectName,
                       )))),
               child: Stack(
                 children: [
@@ -113,20 +113,20 @@ class ProjectList extends StatelessWidget {
 
                                                 Navigator.pop(context);
                                               },
-                                              child: Text('بله'),
+                                              child: const Text('بله'),
                                             ),
                                             TextButton(
                                               onPressed: () {
                                                 Navigator.pop(context);
                                               },
-                                              child: Text('خیر'),
+                                              child: const Text('خیر'),
                                             )
                                           ],
                                         ),
                                       );
                                     });
                               },
-                              child: Icon(
+                              child: const Icon(
                                 CupertinoIcons.delete,
                                 color: Colors.white,
                                 size: 20,
@@ -141,7 +141,7 @@ class ProjectList extends StatelessWidget {
                           'انجام شده : $done',
                           style: theme.textTheme.caption,
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
                         Text(

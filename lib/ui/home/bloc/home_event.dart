@@ -26,12 +26,6 @@ class DeleteTask extends HomeEvent {
 
 class DeleteAll extends HomeEvent {}
 
-class TagClicked extends HomeEvent {
-  final String selectedTag;
-
-  const TagClicked(this.selectedTag);
-}
-
 class DeleteAllProjectTasks extends HomeEvent {
   final List<TaskEntity> tasks;
 

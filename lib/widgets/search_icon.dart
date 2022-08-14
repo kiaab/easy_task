@@ -1,6 +1,5 @@
 import 'package:easy_task/ui/home/home_screen.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
 class SearchIcon extends StatefulWidget {
   const SearchIcon({

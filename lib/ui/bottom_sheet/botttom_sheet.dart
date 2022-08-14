@@ -30,7 +30,7 @@ class _TaskBottomSheetState extends State<TaskBottomSheet> {
         height: MediaQuery.of(context).size.height * 0.4,
         decoration: const BoxDecoration(
             borderRadius: BorderRadius.vertical(
-              top: const Radius.circular(36),
+              top: Radius.circular(36),
             ),
             color: Colors.white),
         child: Column(

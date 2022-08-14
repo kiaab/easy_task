@@ -12,8 +12,9 @@ class ErrorState extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('خطایی رخ داده است '),
-          ElevatedButton(onPressed: () {}, child: Text('دوباره تلاش کنید'))
+          const Text('خطایی رخ داده است '),
+          ElevatedButton(
+              onPressed: () {}, child: const Text('دوباره تلاش کنید'))
         ],
       ),
     );

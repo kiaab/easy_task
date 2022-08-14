@@ -1,20 +1,18 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:easy_task/data/repo/task_repo.dart';
 import 'package:easy_task/data/task.dart';
 import 'package:easy_task/main.dart';
-import 'package:easy_task/onboarding/onboarding.dart';
+
 import 'package:easy_task/ui/add_or_edit/add_edit_screen.dart';
-import 'package:easy_task/ui/bottom_sheet/botttom_sheet.dart';
+
 import 'package:easy_task/ui/home/bloc/home_bloc.dart';
-import 'package:easy_task/ui/project/project.dart';
-import 'package:easy_task/utils.dart';
+
 import 'package:easy_task/widgets/error_state.dart';
 import 'package:easy_task/widgets/project_list.dart';
 import 'package:easy_task/widgets/search_bar.dart';
 import 'package:easy_task/widgets/search_icon.dart';
-import 'package:easy_task/widgets/tag_list.dart';
+
 import 'package:easy_task/widgets/task_list.dart';
 
 import 'package:flutter/cupertino.dart';
@@ -25,7 +23,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 
 final ScrollController homeScrollController = ScrollController();
@@ -37,14 +34,19 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+class _HomeScreenState extends State<HomeScreen>
+    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   Jalali picked = Jalali.now();
   String selectedTag = '';
   HomeBloc? _homeBloc;
+  late AnimationController _animationController;
+  late Animation<double> searchAnimation;
+
   @override
   void dispose() {
     _homeBloc?.close();
     WidgetsBinding.instance.removeObserver(this);
+    _animationController.dispose();
     focusNode.dispose();
     super.dispose();
   }
@@ -60,10 +62,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   @override
   void initState() {
+    _animationController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 800));
+    searchAnimation =
+        CurvedAnimation(parent: _animationController, curve: Curves.linear);
     WidgetsBinding.instance.addObserver(this);
     Hive.box<TaskEntity>(taskBoxName).listenable().addListener(() {
       _homeBloc?.add(HomeStarted());
     });
+    _animationController.forward();
     super.initState();
   }
 
@@ -102,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       homeScrollController.animateTo(0,
                           duration: const Duration(seconds: 1),
                           curve: Curves.decelerate);
-                      Timer(Duration(seconds: 1), () {
+                      Timer(const Duration(seconds: 1), () {
                         focusNode.requestFocus();
                       });
                     }
@@ -122,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           PopupMenuItem(
                             onTap: () {
                               Future.delayed(
-                                  Duration(seconds: 0),
+                                  const Duration(seconds: 0),
                                   () => showDialog(
                                       context: context,
                                       builder: (context) {
@@ -133,7 +140,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                               'آیا از حذف خود مطمعن هستید',
                                               style: theme.textTheme.headline4,
                                             ),
-                                            content: Text(
+                                            content: const Text(
                                                 'با زدن تایید کلیه تسک ها و پروژه های شما حذف خواهد شد '),
                                             actions: [
                                               TextButton(
@@ -142,13 +149,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
                                                   Navigator.pop(context);
                                                 },
-                                                child: Text('بله'),
+                                                child: const Text('بله'),
                                               ),
                                               TextButton(
                                                 onPressed: () {
                                                   Navigator.pop(context);
                                                 },
-                                                child: Text('خیر'),
+                                                child: const Text('خیر'),
                                               )
                                             ],
                                           ),
@@ -156,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                       }));
                             },
                             child: Row(
-                              children: [
+                              children: const [
                                 Icon(CupertinoIcons.delete),
                                 SizedBox(width: 32),
                                 Text('حذف همه')
@@ -165,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           )
                         ]);
                   },
-                  child: Icon(
+                  child: const Icon(
                     CupertinoIcons.ellipsis_vertical,
                   )),
             ),
@@ -217,182 +224,209 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 child: Column(
                   children: [
                     SizedBox(
-                        height: size.height * 0.22,
-                        child: Stack(
+                      height: size.height * 0.22,
+                      child: AnimatedBuilder(
+                        animation: _animationController,
+                        builder: (context, child) => Stack(
                           children: [
                             Container(
                               height: size.height * 0.22 - 26,
                               decoration: BoxDecoration(
-                                  color: theme.colorScheme.primary,
-                                  borderRadius: const BorderRadius.vertical(
-                                      bottom: Radius.circular(48))),
+                                color: theme.colorScheme.primary,
+                                borderRadius: const BorderRadius.vertical(
+                                    bottom: Radius.circular(48)),
+                              ),
                             ),
                             Positioned(
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.only(right: 32, left: 32),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Visibility(
-                                      visible: name.isNotEmpty,
-                                      child: Text(
-                                        'سلام $name',
+                              top: -25 * (1 - _animationController.value),
+                              height: 50,
+                              child: Opacity(
+                                opacity: _animationController.value,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      right: 32, left: 32),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Visibility(
+                                        visible: name.isNotEmpty,
+                                        child: Text(
+                                          'سلام $name',
+                                          style: theme.textTheme.headline6!
+                                              .copyWith(
+                                                  fontSize: 22,
+                                                  color: Colors.white),
+                                          maxLines: 1,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 2,
+                                      ),
+                                      Text(
+                                        Jalali.now().formatFullDate(),
                                         style: theme.textTheme.headline6!
                                             .copyWith(
-                                                fontSize: 22,
-                                                color: Colors.white),
-                                        maxLines: 1,
+                                                color: Colors.white
+                                                    .withOpacity(0.7),
+                                                fontSize: 12,
+                                                height: 1.2),
                                       ),
-                                    ),
-                                    const SizedBox(
-                                      height: 2,
-                                    ),
-                                    Text(
-                                      Jalali.now().formatFullDate(),
-                                      style: theme.textTheme.headline6!
-                                          .copyWith(
-                                              color:
-                                                  Colors.white.withOpacity(0.7),
-                                              fontSize: 12,
-                                              height: 1.2),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
                             Positioned(
-                                right: 0,
-                                left: 0,
-                                bottom: 0,
+                              right: 0,
+                              left: 0,
+                              bottom: 50 * (1 - _animationController.value),
+                              child: Opacity(
+                                opacity: _animationController.value,
                                 child: SearchBar(
                                   focusNode: focusNode,
                                   theme: theme,
-                                ))
+                                ),
+                              ),
+                            )
                           ],
-                        )),
-                    Stack(
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(
-                              height: 28,
-                            ),
-                            Visibility(
-                              visible: projects.isNotEmpty,
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.only(right: 32, left: 32),
-                                child: RichText(
-                                    text: TextSpan(
-                                        style: theme.textTheme.headline4,
-                                        text: 'پروژه ها',
-                                        children: [
-                                      TextSpan(
-                                          text: ' ($projectLenght)',
-                                          style: theme.textTheme.headline4!
-                                              .copyWith(
-                                                  color:
-                                                      MyApp.primaryTextColor))
-                                    ])),
-                              ),
-                            ),
-                            Visibility(
-                              visible: projects.isNotEmpty,
-                              child: ProjectList(
-                                projects: projects,
-                                theme: theme,
-                                homeBloc: _homeBloc,
-                                tasks: state.tasks,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  right: 32, top: 8, left: 32, bottom: 12),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  RichText(
-                                      text: TextSpan(
-                                          style: theme.textTheme.headline4,
-                                          text: 'تسک ها',
-                                          children: [
-                                        TextSpan(
-                                            text: ' ($taskLength)',
-                                            style: theme.textTheme.headline4!
-                                                .copyWith(
-                                                    color:
-                                                        MyApp.primaryTextColor))
-                                      ])),
-                                  InkWell(
-                                    onTap: () async {
-                                      picked = await showPersianDatePicker(
-                                              initialEntryMode:
-                                                  DatePickerEntryMode.calendar,
-                                              context: context,
-                                              initialDate: Jalali.now(),
-                                              firstDate: Jalali(1390),
-                                              lastDate: Jalali(1450)) ??
-                                          picked;
-                                      _homeBloc?.add(HomeStarted());
-                                    },
-                                    child: Text(picked.formatFullDate()),
+                        ),
+                      ),
+                    ),
+                    AnimatedBuilder(
+                      animation: _animationController,
+                      builder: (context, child) => Stack(
+                        children: [
+                          Opacity(
+                            opacity: _animationController.value,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(
+                                  height: 28,
+                                ),
+                                Visibility(
+                                  visible: projects.isNotEmpty,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        right: 32, left: 32),
+                                    child: RichText(
+                                        text: TextSpan(
+                                            style: theme.textTheme.headline4,
+                                            text: 'پروژه ها',
+                                            children: [
+                                          TextSpan(
+                                              text: ' ($projectLenght)',
+                                              style: theme.textTheme.headline4!
+                                                  .copyWith(
+                                                      color: MyApp
+                                                          .primaryTextColor))
+                                        ])),
                                   ),
-                                ],
-                              ),
+                                ),
+                                Visibility(
+                                  visible: projects.isNotEmpty,
+                                  child: ProjectList(
+                                    projects: projects,
+                                    theme: theme,
+                                    homeBloc: _homeBloc,
+                                    tasks: state.tasks,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      right: 32, top: 8, left: 32, bottom: 12),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      RichText(
+                                          text: TextSpan(
+                                              style: theme.textTheme.headline4,
+                                              text: 'تسک ها',
+                                              children: [
+                                            TextSpan(
+                                                text: ' ($taskLength)',
+                                                style: theme
+                                                    .textTheme.headline4!
+                                                    .copyWith(
+                                                        color: MyApp
+                                                            .primaryTextColor))
+                                          ])),
+                                      InkWell(
+                                        onTap: () async {
+                                          picked = await showPersianDatePicker(
+                                                  initialEntryMode:
+                                                      DatePickerEntryMode
+                                                          .calendar,
+                                                  context: context,
+                                                  initialDate: Jalali.now(),
+                                                  firstDate: Jalali(1390),
+                                                  lastDate: Jalali(1450)) ??
+                                              picked;
+                                          _homeBloc?.add(HomeStarted());
+                                        },
+                                        child: Text(picked.formatFullDate()),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Visibility(
+                                    visible: tags.isNotEmpty,
+                                    child: SizedBox(
+                                      height: 50,
+                                      child: ListView.builder(
+                                          physics:
+                                              const BouncingScrollPhysics(),
+                                          scrollDirection: Axis.horizontal,
+                                          itemCount: tags.length,
+                                          padding: const EdgeInsets.fromLTRB(
+                                              32, 0, 32, 4),
+                                          itemBuilder: (context, index) {
+                                            final tagName = tags[index];
+                                            return GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  selectedTag == tagName
+                                                      ? selectedTag = ''
+                                                      : selectedTag = tagName;
+                                                });
+                                              },
+                                              child: AnimatedContainer(
+                                                curve: Curves.bounceInOut,
+                                                duration: const Duration(
+                                                    milliseconds: 400),
+                                                padding:
+                                                    const EdgeInsets.all(8),
+                                                margin: EdgeInsets.fromLTRB(
+                                                    index == tags.length - 1
+                                                        ? 0
+                                                        : 8,
+                                                    0,
+                                                    index == 0 ? 0 : 8,
+                                                    4),
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            18),
+                                                    color: selectedTag ==
+                                                            tagName
+                                                        ? Colors.grey.shade300
+                                                        : Colors.grey.shade50),
+                                                child: Text(
+                                                  tagName,
+                                                ),
+                                              ),
+                                            );
+                                          }),
+                                    )),
+                                TaskList(tasks: tasks, theme: theme),
+                              ],
                             ),
-                            Visibility(
-                                visible: tags.isNotEmpty,
-                                child: SizedBox(
-                                  height: 50,
-                                  child: ListView.builder(
-                                      physics: const BouncingScrollPhysics(),
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: tags.length,
-                                      padding:
-                                          EdgeInsets.fromLTRB(32, 0, 32, 4),
-                                      itemBuilder: (context, index) {
-                                        final tagName = tags[index];
-                                        return GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              selectedTag == tagName
-                                                  ? selectedTag = ''
-                                                  : selectedTag = tagName;
-                                            });
-                                          },
-                                          child: AnimatedContainer(
-                                            curve: Curves.bounceInOut,
-                                            duration:
-                                                Duration(milliseconds: 400),
-                                            padding: EdgeInsets.all(8),
-                                            margin: EdgeInsets.fromLTRB(
-                                                index == tags.length - 1
-                                                    ? 0
-                                                    : 8,
-                                                0,
-                                                index == 0 ? 0 : 8,
-                                                4),
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(18),
-                                                color: selectedTag == tagName
-                                                    ? Colors.grey.shade300
-                                                    : Colors.grey.shade50),
-                                            child: Text(
-                                              tagName,
-                                            ),
-                                          ),
-                                        );
-                                      }),
-                                )),
-                            TaskList(tasks: tasks, theme: theme),
-                          ],
-                        )
-                      ],
-                    )
+                          )
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               );
@@ -420,7 +454,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       'هنوز تسکی نساختی',
                       style: theme.textTheme.bodyText1!.copyWith(fontSize: 14),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 12,
                     ),
                     InkWell(
@@ -435,7 +469,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         _homeBloc?.add(HomeStarted());
                       },
                       child: Container(
-                          padding: EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                               border: Border(
                                   bottom: BorderSide(

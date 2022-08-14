@@ -2,8 +2,6 @@ import 'package:bloc/bloc.dart';
 import 'package:easy_task/data/repo/task_repo.dart';
 import 'package:easy_task/data/task.dart';
 import 'package:easy_task/utils.dart';
-import 'package:equatable/equatable.dart';
-import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
@@ -31,7 +29,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           } else {
             searchKey = '';
           }
-          //get all tasks from database
 
           //get tag list if it's already empty
           List<String> tags = [];
@@ -39,7 +36,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           //get project list if it's already empty
           List<String> projects = [];
           getProjects(projects, tasks);
-          final List<TaskEntity> tasksSearch;
 
           if (tasks.isEmpty && event is HomeStarted) {
             emit(EmptyState());

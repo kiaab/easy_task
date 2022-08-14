@@ -19,13 +19,6 @@ class HomeSuccess extends HomeState {
   );
 }
 
-class HomeSuccessSearch extends HomeState {
-  final List<TaskEntity> tasks;
-  final List<TaskEntity> tasksSearch;
-
-  const HomeSuccessSearch(this.tasks, this.tasksSearch);
-}
-
 class HomeError extends HomeState {}
 
 class EmptyState extends HomeState {}

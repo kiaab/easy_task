@@ -2,14 +2,12 @@ import 'package:easy_task/data/repo/task_repo.dart';
 import 'package:easy_task/data/task.dart';
 import 'package:easy_task/main.dart';
 import 'package:easy_task/ui/add_or_edit/bloc/add_or_edit_bloc.dart';
-import 'package:easy_task/ui/home/bloc/home_bloc.dart';
 
 import 'package:easy_task/widgets/tag_list.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 
@@ -22,7 +20,7 @@ class AddOrEditScreen extends StatefulWidget {
 }
 
 class _AddOrEditScreenState extends State<AddOrEditScreen>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   bool titleFieldEmpty = false;
 
   final FocusNode titleFocusNode = FocusNode();
@@ -30,11 +28,23 @@ class _AddOrEditScreenState extends State<AddOrEditScreen>
   final FocusNode contentFocusNode = FocusNode();
   final FocusNode projectFocusNode = FocusNode();
 
+  TextEditingController? projectTextController;
+  TextEditingController? tagTextController;
+  TextEditingController? contentTextController;
+  TextEditingController? titleTextController;
   String picked = '';
   @override
   void initState() {
     picked = widget.task.date;
     WidgetsBinding.instance.addObserver(this);
+    titleTextController = TextEditingController(text: widget.task.title);
+
+    contentTextController = TextEditingController(text: widget.task.content);
+
+    tagTextController = TextEditingController(text: widget.task.tag);
+
+    projectTextController =
+        TextEditingController(text: widget.task.projectName);
     super.initState();
   }
 
@@ -55,6 +65,7 @@ class _AddOrEditScreenState extends State<AddOrEditScreen>
     WidgetsBinding.instance.removeObserver(this);
     titleFocusNode.dispose();
     tagFocusNode.dispose();
+
     contentFocusNode.dispose();
     projectFocusNode.dispose();
     super.dispose();
@@ -63,18 +74,6 @@ class _AddOrEditScreenState extends State<AddOrEditScreen>
   AddOrEditBloc? editBloc;
   @override
   Widget build(BuildContext context) {
-    final TextEditingController titleTextController =
-        TextEditingController(text: widget.task.title);
-
-    final TextEditingController contentTextController =
-        TextEditingController(text: widget.task.content);
-
-    final TextEditingController tagTextController =
-        TextEditingController(text: widget.task.tag);
-
-    final TextEditingController projectTextController =
-        TextEditingController(text: widget.task.projectName);
-
     final ThemeData theme = Theme.of(context);
     return BlocProvider<AddOrEditBloc>(
       create: (context) {
@@ -100,11 +99,11 @@ class _AddOrEditScreenState extends State<AddOrEditScreen>
             floatingActionButton: FloatingActionButton(
               backgroundColor: theme.colorScheme.primary,
               onPressed: () {
-                if (titleTextController.text.isNotEmpty) {
-                  widget.task.title = titleTextController.text;
-                  widget.task.content = contentTextController.text;
-                  widget.task.tag = tagTextController.text;
-                  widget.task.projectName = projectTextController.text;
+                if (titleTextController!.text.isNotEmpty) {
+                  widget.task.title = titleTextController!.text;
+                  widget.task.content = contentTextController!.text;
+                  widget.task.tag = tagTextController!.text;
+                  widget.task.projectName = projectTextController!.text;
                   widget.task.date = picked;
 
                   editBloc?.add(Save(widget.task));
@@ -345,6 +344,7 @@ class _AddOrEditScreenState extends State<AddOrEditScreen>
                               child: SizedBox(
                                 height: 50,
                                 child: ListView.builder(
+                                    physics: const BouncingScrollPhysics(),
                                     padding: const EdgeInsets.only(
                                       left: 28,
                                       right: 28,
@@ -356,7 +356,7 @@ class _AddOrEditScreenState extends State<AddOrEditScreen>
                                       return InkWell(
                                         borderRadius: BorderRadius.circular(18),
                                         onTap: () {
-                                          projectTextController.text =
+                                          projectTextController!.text =
                                               projectName;
                                         },
                                         child: Container(
@@ -384,7 +384,7 @@ class _AddOrEditScreenState extends State<AddOrEditScreen>
                         ),
                       ));
                 } else if (state is AddOrEditInitial) {
-                  return Center(
+                  return const Center(
                     child: CircularProgressIndicator(),
                   );
                 } else {
