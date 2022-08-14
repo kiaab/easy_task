@@ -62,8 +62,8 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void initState() {
-    _animationController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 800));
+    _animationController =
+        AnimationController(vsync: this, duration: const Duration(seconds: 1));
     searchAnimation =
         CurvedAnimation(parent: _animationController, curve: Curves.linear);
     WidgetsBinding.instance.addObserver(this);

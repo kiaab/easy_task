@@ -10,6 +10,9 @@ import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/adapters.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
 const taskBoxName = 'taskBox';
 
 final GetIt getIt = GetIt.instance;
@@ -20,6 +23,9 @@ void main() async {
   name = await getName();
   newUser = await isNewUser();
 
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await Hive.initFlutter();
 
   Hive.registerAdapter(TaskAdapter());
