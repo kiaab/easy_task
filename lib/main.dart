@@ -88,7 +88,8 @@ class _MyAppState extends State<MyApp> {
           ),
           colorScheme: const ColorScheme.light(
               primary: Color(0xFF0d12d7),
-              onSurface: Color(0xFFECEEEC),
+              onSurface: Color(0xff273067),
+              onPrimary: Colors.white,
               secondary: Color(0xffffa200))),
       home: Directionality(
           textDirection: TextDirection.rtl,
