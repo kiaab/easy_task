@@ -119,7 +119,7 @@ class _TaskBottomSheetState extends State<TaskBottomSheet> {
                             textDirection: TextDirection.rtl,
                             child: AlertDialog(
                               title: Text(
-                                'انتقال تسک به تاریخ فعلی ؟',
+                                'انتقال تسک به امروز ؟',
                                 style: widget.theme.textTheme.headline4,
                               ),
                               actions: [
